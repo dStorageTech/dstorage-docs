@@ -7,7 +7,7 @@ export default defineConfig({
     "Privacy-first data layer for dApps — client-side encryption + decentralised storage + on-chain coordination in a single SDK.",
   base: "/docs/",
   appearance: "dark",
-  srcExclude: ["README.md", "DEPLOYING.md"],
+  srcExclude: ["README.md"],
 
   head: [
     ["link", { rel: "preconnect", href: "https://fonts.googleapis.com" }],

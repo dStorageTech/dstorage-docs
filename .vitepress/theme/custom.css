@@ -1,0 +1,88 @@
+/* Design tokens ported from dstorage-pro/public/index.html (the dstorage.pro
+   marketing site) for visual parity between the docs site and the main site. */
+
+:root {
+  --vp-font-family-base: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --vp-font-family-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+
+  /* Light mode — derived from the same accent family; the marketing site has
+     no light mode to copy from, so these are a reasonable, high-contrast
+     default rather than a pixel-matched source. */
+  --vp-c-bg: #ffffff;
+  --vp-c-bg-alt: #f5f7fa;
+  --vp-c-bg-soft: #eef1f6;
+  --vp-c-text-1: #0e1018;
+  --vp-c-text-2: rgba(14, 16, 24, 0.7);
+  --vp-c-text-3: rgba(14, 16, 24, 0.45);
+  --vp-c-divider: rgba(14, 16, 24, 0.1);
+  --vp-c-border: rgba(14, 16, 24, 0.12);
+
+  --vp-c-brand-1: #009e88;
+  --vp-c-brand-2: #00b89f;
+  --vp-c-brand-3: #00cbb0;
+  --vp-c-brand-soft: rgba(0, 158, 136, 0.14);
+
+  --docs-radius: 12px;
+  --docs-radius-lg: 18px;
+}
+
+.dark {
+  --vp-c-bg: #08090c;
+  --vp-c-bg-alt: #0e1018;
+  --vp-c-bg-soft: #0e1018;
+  --vp-c-bg-elv: #0e1018;
+  --vp-c-text-1: #f0f2f8;
+  --vp-c-text-2: rgba(240, 242, 248, 0.68);
+  --vp-c-text-3: rgba(240, 242, 248, 0.3);
+  --vp-c-divider: rgba(255, 255, 255, 0.07);
+  --vp-c-border: rgba(255, 255, 255, 0.12);
+  --vp-c-gutter: rgba(255, 255, 255, 0.07);
+
+  --vp-c-brand-1: #00e5c8;
+  --vp-c-brand-2: #1fffd8;
+  --vp-c-brand-3: #00e5c8;
+  --vp-c-brand-soft: rgba(0, 229, 200, 0.12);
+}
+
+/* Buttons */
+:root {
+  --vp-button-brand-bg: var(--vp-c-brand-1);
+  --vp-button-brand-hover-bg: var(--vp-c-brand-2);
+  --vp-button-brand-text: #08090c;
+}
+
+/* Headings use the marketing site's display font */
+.vp-doc h1,
+.vp-doc h2,
+.vp-doc h3,
+.VPHero .name,
+.VPHero .text,
+.VPFeature .title {
+  font-family: "Nunito", sans-serif;
+  font-weight: 900;
+  letter-spacing: -0.02em;
+}
+
+.VPHero .name {
+  background: linear-gradient(135deg, #00e5c8, #8b5cf6);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Rounded, borderless card/button conventions from the marketing site */
+.VPFeature {
+  border-radius: var(--docs-radius-lg) !important;
+}
+
+.VPButton {
+  border-radius: 8px !important;
+}
+
+.dark .VPButton.brand {
+  box-shadow: 0 0 22px rgba(0, 229, 200, 0.3);
+}
+
+div[class*="language-"] {
+  border-radius: var(--docs-radius) !important;
+}

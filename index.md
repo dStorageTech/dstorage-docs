@@ -7,8 +7,8 @@ hero:
   tagline: Client-side encryption + decentralised storage + on-chain coordination in a single SDK.
   actions:
     - theme: brand
-      text: Quick Start
-      link: /guide/quick-start
+      text: Get Started
+      link: /guide/mock-adapters
     - theme: alt
       text: FAQ
       link: /faq/

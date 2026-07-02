@@ -27,7 +27,7 @@ export default defineConfig({
   themeConfig: {
     siteTitle: false,
     nav: [
-      { text: "Guide", link: "/guide/quick-start" },
+      { text: "Guide", link: "/guide/mock-adapters" },
       { text: "FAQ", link: "/faq/" },
       { text: "Reference", link: "/reference/" },
       { text: "Architecture", link: "/architecture/" },
@@ -37,7 +37,16 @@ export default defineConfig({
       "/guide/": [
         {
           text: "Guide",
-          items: [{ text: "Quick Start", link: "/guide/quick-start" }],
+          items: [
+            { text: "Mock Adapters", link: "/guide/mock-adapters" },
+            { text: "Core Concepts", link: "/guide/core-concepts" },
+            {
+              text: "Local & Simulator Adapters",
+              link: "/guide/local-simulator-adapters",
+            },
+            { text: "Midnight Adapters", link: "/guide/midnight-adapters" },
+            { text: "Managed Adapters", link: "/guide/managed-adapters" },
+          ],
         },
       ],
       "/faq/": buildFaqSidebar(),

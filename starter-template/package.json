@@ -1,0 +1,18 @@
+{
+  "name": "dstorage-guide-starter",
+  "description": "Minimal Node.js starter for following the dStorage SDK docs guides",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "start": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@dstorage-tech/chain": "file:../dstorage-sdk/packages/chain",
+    "@dstorage-tech/dstorage": "file:../dstorage-sdk/packages/core"
+  },
+  "devDependencies": {
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.3"
+  }
+}

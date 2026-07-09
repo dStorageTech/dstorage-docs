@@ -12,6 +12,8 @@ network calls.
 
 That's it — Mock adapters need no wallet extensions, no proof server, and no tokens.
 
+Fast track: clone [`starter-template`](https://github.com/dStorageTech/dstorage-docs/tree/main/starter-template) and wire up this guide's adapters in minutes.
+
 ## Install
 
 ```sh
@@ -52,12 +54,14 @@ const sdk = new DStorage({
 The `salt` scopes key derivation to your application — use an app-specific label like this one,
 not a per-user secret.
 
-## Step 2 — Init, upload, retrieve
+## Step 2 — Init, store, retrieve
 
 ```typescript
 await sdk.init();
 
-const { chainRefId } = await sdk.store(new TextEncoder().encode("hello, dStorage"));
+const { chainRefId } = await sdk.store(
+  new TextEncoder().encode("hello, dStorage"),
+);
 
 const { bytes } = await sdk.retrieveByRefId(chainRefId);
 console.log(new TextDecoder().decode(bytes)); // "hello, dStorage"
@@ -66,7 +70,8 @@ console.log(new TextDecoder().decode(bytes)); // "hello, dStorage"
 What happened at each step:
 
 1. **`sdk.init()`** prepares the SDK — with a `chainAdapter` configured, this is where the
-   `DataRegistry` contract gets deployed (or joined, if you passed an existing address).
+   `DataRegistry` contract gets deployed (or joined, if you passed an existing address — more on
+   that in the [Midnight Adapters](/guide/midnight-adapters) guide).
 2. **`sdk.store()`** encrypts your data on the client with a fresh random key before anything
    leaves the process, uploads the ciphertext via the storage adapter, and writes an encrypted
    reference on-chain via the chain adapter. It returns a `chainRefId` — your handle for
@@ -88,10 +93,6 @@ This immediately wipes the in-memory key material (the live encryption adapters 
 reference) so it doesn't linger in the JS heap for the lifetime of the process or page. It does
 **not** delete any stored data or on-chain references — only the local key material.
 
-## What's next
+## Learn More
 
-- **[Core Concepts](/guide/core-concepts)** — the DEK/KEK model, `storageId` vs `refId`, and how adapters compose.
-- **[Local & Simulator Adapters](/guide/local-simulator-adapters)** — real circuit behavior and local storage, still no live wallet or Docker proof server.
-- **[Midnight Adapters](/guide/midnight-adapters)** — wire dStorage into a real Midnight app with a real wallet.
-- **[Managed Adapters](/guide/managed-adapters)** — swap in `ArweaveBundlerStorageAdapter` and managed payments via dStorage Pro.
 - Browse the [FAQ](/faq/) for answers on encryption, adapters, and troubleshooting.

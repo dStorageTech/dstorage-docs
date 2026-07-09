@@ -17,6 +17,8 @@ chain — so tests written against these adapters exercise realistic behavior.
 - No Midnight proof server, wallet extension, or DUST tokens needed —
   `MidnightSimulatorChainAdapter` runs the real `DataRegistry` circuits in-process
 
+Fast track: clone [`starter-template`](https://github.com/dStorageTech/dstorage-docs/tree/main/starter-template) and wire up this guide's adapters in minutes.
+
 ## Step 1 — Start arlocal
 
 ```sh
@@ -56,14 +58,16 @@ const sdk = new DStorage({
 });
 ```
 
-## Step 3 — Init, upload, retrieve
+## Step 3 — Init, store, retrieve
 
 The API is identical to the Mock Adapters guide — that's the point, adapters are interchangeable:
 
 ```typescript
 await sdk.init();
 
-const { chainRefId } = await sdk.store(new TextEncoder().encode("hello, dStorage"));
+const { chainRefId } = await sdk.store(
+  new TextEncoder().encode("hello, dStorage"),
+);
 
 const { bytes } = await sdk.retrieveByRefId(chainRefId);
 console.log(new TextDecoder().decode(bytes)); // "hello, dStorage"
@@ -79,8 +83,6 @@ What's different from Mock under the hood:
 - **Uploads really travel over HTTP** to your local arlocal instance, rather than staying in a
   JS `Map`.
 
-## What's next
+## Learn More
 
-- **[Midnight Adapters](/guide/midnight-adapters)** — the real Midnight network, a real wallet, and a live proof server.
-- **[Managed Adapters](/guide/managed-adapters)** — production storage via `ArweaveBundlerStorageAdapter` and managed payments.
 - Browse the [FAQ](/faq/adapters) for the full adapter reference.

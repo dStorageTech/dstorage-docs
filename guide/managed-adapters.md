@@ -14,6 +14,8 @@ and signs on their behalf for both.
   it no longer needs to hold any DUST
 - A dStorage Pro auth token — sign up at [dstorage.pro](https://dstorage.pro)
 
+Fast track: clone [`starter-template`](https://github.com/dStorageTech/dstorage-docs/tree/main/starter-template) and wire up this guide's adapters in minutes.
+
 ## Step 1 — Get an auth token
 
 Tokens come in two flavors, and the choice matters:
@@ -78,14 +80,16 @@ though — it's used to expose the public keys the ZK circuit needs
 (`getCoinPublicKey()`/`getEncryptionPublicKey()`). It just doesn't need to be funded or synced
 with the network, since the signing server handles balancing and signing instead of the wallet.
 
-## Step 3 — Init, upload, retrieve
+## Step 3 — Init, store, retrieve
 
 Same call pattern as every other guide in this series:
 
 ```typescript
 await sdk.init();
 
-const { chainRefId } = await sdk.store(new TextEncoder().encode("hello, dStorage"));
+const { chainRefId } = await sdk.store(
+  new TextEncoder().encode("hello, dStorage"),
+);
 
 const { bytes } = await sdk.retrieveByRefId(chainRefId);
 console.log(new TextDecoder().decode(bytes)); // "hello, dStorage"
@@ -115,7 +119,7 @@ new ArweaveBundlerStorageAdapter({
 });
 ```
 
-## What's next
+## Learn More
 
 You've reached the end of the adapter progression — from fully in-memory Mock adapters, through
 local/simulator adapters, to a real Midnight network with fully managed Arweave and DUST

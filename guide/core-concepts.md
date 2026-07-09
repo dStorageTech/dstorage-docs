@@ -60,7 +60,6 @@ walk through those combinations.
 - **On-chain** (the `DataRegistry` contract): the encrypted `storageId`, the encrypted
   `keyEnvelope`, and a few small metadata fields. Never the raw data, never an unwrapped key.
 
-## Next
+## Learn More
 
-- **[Local & Simulator Adapters](/guide/local-simulator-adapters)** — see these pieces working with real (local) storage and real circuit behavior.
 - Browse the [FAQ](/faq/concepts) for more depth on any of these topics, including [encryption & security](/faq/encryption-security).

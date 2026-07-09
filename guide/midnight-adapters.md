@@ -14,6 +14,8 @@ and a real proof server. It's the first guide in this series that talks to live 
 - [Lace](https://www.lace.io) wallet extension (version 1.36.2 or later), if you're targeting
   the browser connector flow below
 
+Fast track: clone [`starter-template`](https://github.com/dStorageTech/dstorage-docs/tree/main/starter-template) and wire up this guide's adapters in minutes.
+
 ## Step 1 — Start the Midnight proof server
 
 ```sh
@@ -76,14 +78,16 @@ const chainAdapter = new MidnightChainAdapter({
 This guide keeps `ArweaveLocalStorageAdapter` for storage, to isolate what changes on the chain
 side. Swapping in real Arweave storage is covered in [Managed Adapters](/guide/managed-adapters).
 
-## Step 3 — Init, upload, retrieve
+## Step 3 — Init, store, retrieve
 
 Same call pattern as every other guide in this series:
 
 ```typescript
 await sdk.init(); // deploys (or joins) the DataRegistry contract on-chain
 
-const { chainRefId } = await sdk.store(new TextEncoder().encode("hello, dStorage"));
+const { chainRefId } = await sdk.store(
+  new TextEncoder().encode("hello, dStorage"),
+);
 
 const { bytes } = await sdk.retrieveByRefId(chainRefId);
 console.log(new TextDecoder().decode(bytes)); // "hello, dStorage"
@@ -99,7 +103,6 @@ What's different now that you're on a live network:
   `contractAddress` on the next run, so you reconnect to the same contract instead of deploying
   a new one each time.
 
-## What's next
+## Learn More
 
-- **[Managed Adapters](/guide/managed-adapters)** — production storage via `ArweaveBundlerStorageAdapter`, and managed payments so end-users don't need their own AR wallet.
 - Browse the FAQ for more on [deployment & configuration](/faq/deployment-configuration) and the [full adapter reference](/faq/adapters).

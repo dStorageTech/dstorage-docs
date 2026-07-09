@@ -2,8 +2,6 @@
 
 Documentation site for the [dStorage SDK](https://github.com/dStorageTech/dstorage-sdk), built with [VitePress](https://vitepress.dev).
 
-This repo starts out standalone and will eventually be merged back into the `dstorage-sdk` monorepo once the site structure and content have stabilized.
-
 ## Development
 
 ```bash
@@ -20,9 +18,7 @@ npm run docs:preview
 
 ## Deploying
 
-This site is served at **https://dstorage.pro/docs** — a subpath of the main dstorage.pro
-marketing site, not GitHub Pages. It's a static build, published manually (no CI/CD wired up
-for this yet).
+This site is served at **https://dstorage.pro/docs** — a subpath of the main dstorage.pro, not GitHub Pages.
 
 ### 1. Build
 
@@ -35,29 +31,15 @@ Output lands in `.vitepress/dist/`. The `base: '/docs/'` setting in `.vitepress/
 means every asset/link in that output is already prefixed with `/docs/`, so the build only
 works correctly when served under that subpath (not at the domain root).
 
-### 2. Copy into dstorage-pro
+### 2. Copy into your hosting site
 
-The dstorage.pro site's source is `dstorage-pro/public/index.html`, deployed via Firebase
-Hosting (`.firebaserc` → project `dstorage-c3a56`) with `public/` as the Hosting root. Copy
-the build output there, under a `docs/` subfolder:
+Copy the build output into your hosting project's public/static directory, under whatever
+subpath matches the `base: '/docs/'` config above — typically a `docs/` subfolder:
 
 ```bash
-rsync -a --delete .vitepress/dist/ ../dstorage-pro/public/docs/
+rsync -a --delete .vitepress/dist/ <path-to-your-hosting-repo>/public/docs/
 ```
 
-(Adjust the relative path if your checkout layout differs — the two repos are expected to be
-sibling directories.) This only touches `public/docs/`; it doesn't touch `public/index.html`
-or the marketing site's other assets.
-
-### 3. Deploy dstorage-pro
-
-Deploy `dstorage-pro` however you currently do (e.g. `firebase deploy --only hosting` from
-that repo).
-
-**Before deploying, check `firebase.json`'s hosting `rewrites`.** As of this writing there is
-no `firebase.json` in the `dstorage-pro` working tree — one existed early in the project's
-history with a catch-all rewrite (`{"source": "**", "destination": "/index.html"}`), which
-would swallow every request under `/docs/*` and serve the marketing page instead of the docs.
-If your current Firebase Hosting config (locally or already live) has anything like that
-catch-all, add an exception for `/docs/**` above it, or scope the rewrite more narrowly, before
-relying on this deploy.
+(For example, if your hosting repo is checked out as a sibling directory, that path might look
+like `../your-hosting-repo/public/docs/`.) This only touches the `docs/` subfolder; it doesn't
+touch the rest of the hosting site's assets.

@@ -4,7 +4,7 @@ The [Mock Adapters](/guide/mock-adapters) guide showed *how* to call the SDK. Th
 *why* it works the way it does — the three ideas worth having in your head before you plug in
 real adapters.
 
-## The DEK/KEK model
+## How your data gets encrypted
 
 Every upload gets its own random encryption key, called the **DEK** (Data Encryption Key). The
 DEK encrypts your data — and only your data for that one upload.
@@ -26,11 +26,11 @@ unlock the data on its own.
 
 Two different identifiers come out of `sdk.store()`, and they point at two different things:
 
-- **`storageId`** identifies the encrypted blob on the storage network itself (a 43-character
-  string). It's a pointer to *bytes*.
-- **`refId`** identifies the on-chain record in the `DataRegistry` contract (a 32-byte value).
-  It's a pointer to a *reference* — which itself contains the (encrypted) `storageId`, plus the
-  `keyEnvelope` needed to decrypt.
+- **`storageId`** identifies the encrypted blob on the storage network itself. It's a pointer
+  to *bytes*.
+- **`refId`** identifies the on-chain record in the `DataRegistry` contract. It's a pointer to
+  a *reference* — which itself contains the (encrypted) `storageId`, plus the
+  `keyEnvelope` needed to decrypt the stored blob.
 
 In everyday use you only need `refId`: `retrieveByRefId(refId)` looks up the reference, finds
 the storage pointer, downloads the ciphertext, and decrypts it — all in one call. `storageId` is
@@ -46,7 +46,7 @@ question:
 | ---------------------- | ------------------------------------------ | -------------------------------------- |
 | `storageAdapter`      | Where do the encrypted bytes live?        | Always                                |
 | `chainAdapter`        | Where's the on-chain reference written?   | Optional — omit for storage-only mode |
-| `encryptionAdapters`  | How is the per-upload DEK protected?      | Optional — omit for public uploads    |
+| `encryptionAdapters`  | How is the per-upload encryption key protected? | Optional — omit for public uploads    |
 
 Because these are independent, you can mix and match: start with Mock everything for local
 development, swap in `ArweaveLocalStorageAdapter` once you want realistic storage behavior, then
@@ -58,7 +58,8 @@ walk through those combinations.
 
 - **Off-chain** (the storage network): the encrypted data payload — the actual bytes.
 - **On-chain** (the `DataRegistry` contract): the encrypted `storageId`, the encrypted
-  `keyEnvelope`, and a few small metadata fields. Never the raw data, never an unwrapped key.
+  `keyEnvelope`, and a few small metadata fields — also encrypted, and optionally supplied by
+  you via `store()`. Never the raw data, never an unwrapped key.
 
 ## Learn More
 

@@ -68,5 +68,5 @@ behave identically regardless of file size.
 
 This page covers the system's big-picture shape. For the details behind the `[encrypt]` step:
 
-- **[Core Concepts](/guide/core-concepts)** — the DEK/KEK model, `storageId` vs `refId`, and how adapters compose.
+- **[Core Concepts](/guide/core-concepts)** — how your data gets encrypted, `storageId` vs `refId`, and how adapters compose.
 - **[FAQ: Encryption & Security](/faq/encryption-security)** — cryptographic primitives, wire formats, and post-quantum safety per adapter.

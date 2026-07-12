@@ -27,7 +27,7 @@ async function run() {
   log("Creating Midnight network adapter...");
   const chainAdapter = new MidnightChainAdapter({
     walletMode: "connector",
-    connectorName: "mnLace", // window.midnight.mnLace — omit to use whichever wallet is found first
+    connectorName: "lace", // window.midnight.lace — omit to use whichever wallet is found first
     zkConfigBaseUrl: window.location.origin, // serves the keys/ and zkir/ copied to public/
     network: "preprod",
     proofServerEndpoint: "http://localhost:6300",

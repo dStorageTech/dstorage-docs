@@ -76,7 +76,7 @@ const { adapter: storageAdapter } = await ArweaveLocalStorageAdapter.createWithT
 
 const chainAdapter = new MidnightChainAdapter({
   walletMode: "connector",
-  connectorName: "mnLace", // window.midnight.mnLace — omit to use whichever wallet is found first
+  connectorName: "lace", // window.midnight.lace — omit to use whichever wallet is found first
   zkConfigBaseUrl: window.location.origin, // serves the keys/ and zkir/ you copied to public/
   network: "preprod", // matches the Preprod Faucet used to fund your wallet
   proofServerEndpoint: "http://localhost:6300",

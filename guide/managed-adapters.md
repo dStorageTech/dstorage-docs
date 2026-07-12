@@ -1,6 +1,6 @@
 # Managed Adapters
 
-The [Midnight Adapters](/guide/midnight-adapters) guide used a real Midnight network with a
+The [Midnight Network Adapter](/guide/midnight-network-adapter) guide used a real Midnight network with a
 DUST-funded wallet, and kept storage local. This guide routes *both* sides through dStorage
 Pro's managed signing service (`https://dstorage.pro`): `ArweaveBundlerStorageAdapter` for
 storage, and `MidnightChainAdapter` configured with the same signing-server credentials for
@@ -9,7 +9,7 @@ and signs on their behalf for both.
 
 ## Prerequisites
 
-- Everything from the [Midnight Adapters](/guide/midnight-adapters) guide, **except** the
+- Everything from the [Midnight Network Adapter](/guide/midnight-network-adapter) guide, **except** the
   DUST-funded wallet — a Midnight wallet identity is still needed (see the note in Step 2), but
   it no longer needs to hold any DUST
 - A dStorage Pro auth token — sign up at [dstorage.pro](https://dstorage.pro)

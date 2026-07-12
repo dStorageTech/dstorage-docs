@@ -7,7 +7,7 @@ export default defineConfig({
     "Privacy-first data layer for dApps — client-side encryption + decentralised storage + on-chain coordination in a single SDK.",
   base: "/docs/",
   appearance: "dark",
-  srcExclude: ["README.md"],
+  srcExclude: ["README.md", "dstorage-sdk/**"],
 
   head: [
     ["link", { rel: "preconnect", href: "https://fonts.googleapis.com" }],
@@ -45,7 +45,10 @@ export default defineConfig({
               text: "Local & Simulator Adapters",
               link: "/guide/local-simulator-adapters",
             },
-            { text: "Midnight Adapters", link: "/guide/midnight-adapters" },
+            {
+              text: "Midnight Network Adapter",
+              link: "/guide/midnight-network-adapter",
+            },
             { text: "Managed Adapters", link: "/guide/managed-adapters" },
           ],
         },

@@ -71,7 +71,7 @@ What happened at each step:
 
 1. **`sdk.init()`** prepares the SDK — with a `chainAdapter` configured, this is where the
    `DataRegistry` contract gets deployed (or joined, if you passed an existing address — more on
-   that in the [Midnight Adapters](/guide/midnight-adapters) guide).
+   that in the [Midnight Network Adapter](/guide/midnight-network-adapter) guide).
 2. **`sdk.store()`** encrypts your data on the client with a fresh random key before anything
    leaves the process, uploads the ciphertext via the storage adapter, and writes an encrypted
    reference on-chain via the chain adapter. It returns a `chainRefId` — your handle for

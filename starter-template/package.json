@@ -5,7 +5,9 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "start": "tsx src/index.ts"
+    "start": "tsx src/index.ts",
+    "predev": "node scripts/copy-zk-artifacts.mjs",
+    "dev": "vite"
   },
   "dependencies": {
     "@dstorage-tech/chain": "file:../dstorage-sdk/packages/chain",
@@ -13,6 +15,7 @@
   },
   "devDependencies": {
     "tsx": "^4.21.0",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "vite": "^8.1.4"
   }
 }

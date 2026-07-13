@@ -1,40 +1,48 @@
-# Managed Adapters
+# Managed Payments Service
 
-The [Midnight Network Adapter](/guide/midnight-network-adapter) guide used a real Midnight network with a
-DUST-funded wallet, and kept storage local. This guide routes *both* sides through dStorage
-Pro's managed signing service (`https://dstorage.pro`): `ArweaveBundlerStorageAdapter` for
-storage, and `MidnightChainAdapter` configured with the same signing-server credentials for
-chain. End-users need no AR wallet and no DUST-funded Midnight wallet — the signing server pays
-and signs on their behalf for both.
+dStorage Pro is a hosted signing/payment service run by the dStorage team. It fronts Arweave
+storage costs and Midnight DUST chain fees on your behalf, billed to your dStorage Pro account
+instead of drawn from each end user's own wallet — access is authorized per-request via a token
+you configure once. This guide takes the [Midnight Network Adapter](/guide/midnight-network-adapter)
+guide's browser app and turns this service on for both the storage and chain sides, so your
+end users never need their own funded AR wallet or DUST-funded Midnight wallet.
 
 ## Prerequisites
 
-- Everything from the [Midnight Network Adapter](/guide/midnight-network-adapter) guide, **except** the
-  DUST-funded wallet — a Midnight wallet identity is still needed (see the note in Step 2), but
-  it no longer needs to hold any DUST
-- A dStorage Pro auth token — sign up at [dstorage.pro](https://dstorage.pro)
+Everything from the [Midnight Network Adapter](/guide/midnight-network-adapter) guide, with two
+changes:
 
-Fast track: clone [`starter-template`](https://github.com/dStorageTech/dstorage-docs/tree/main/starter-template) and wire up this guide's adapters in minutes.
+- Node.js 22 or later, to run the Vite dev server
+- Docker, to run the Midnight proof server
+- [Lace](https://www.lace.io) wallet extension (version 2.0 or later), switched to the Preprod
+  network — your wallet still connects to expose public keys and submit transactions, but it no
+  longer needs to hold any DUST
+- ~~arlocal~~ — not needed anymore; this guide uses real Arweave via dStorage Pro's bundler
+  instead of a local test wallet
+- A dStorage Pro account and token — sign up at [dstorage.pro](https://dstorage.pro)
 
-## Step 1 — Get an auth token
+Fast track: clone [`starter-template`](https://github.com/dStorageTech/dstorage-docs/tree/main/starter-template) — its `src/main.ts` already has the Midnight Network Adapter guide's browser app wired up, so you can use it as the base for this guide's changes. Run `npm install && npm run dev` and open the printed local URL.
 
-Tokens come in two flavors, and the choice matters:
+## Step 1 — Get a dStorage Pro API token
 
-- **`ds_*` secret token** — full account access (manage other tokens, payment history). Server-side
-  only — never ship one in browser JavaScript.
+Tokens come in two flavors:
+
 - **JWT token** — scoped and safe to embed in a browser bundle. Its allowed origin, spend cap,
   and request cap are baked into the signature, and it's instantly revocable from the portal.
+  This is what the rest of this guide uses.
+- **`ds_*` secret token** — full account access (manage other tokens, payment history). Server-side
+  only — never ship one in browser JavaScript. Use this instead if you're proxying requests
+  through your own Node.js backend rather than calling dStorage Pro directly from the browser;
+  see the [full adapter reference](/faq/adapters) for that setup.
 
-For a Node.js backend, a `ds_*` token is simplest. Set it via environment variables:
+Copy your JWT token from the dStorage Pro portal — you'll paste it directly into the adapter
+config in Step 2.
 
-```sh
-export DSTORAGE_SERVICE_URL=https://dstorage.pro
-export DSTORAGE_AUTH_TOKEN=ds_your_token_here
-```
+## Step 2 — Add managed payments to your adapters
 
-## Step 2 — Configure the SDK
-
-Both the storage adapter and the chain adapter accept `signingServerUrl` / `authToken`:
+Starting from the same connector-mode `chainAdapter` as the Midnight Network Adapter guide, two
+things change: the storage adapter swaps to `ArweaveBundlerStorageAdapter`, and both adapters get
+a `signingServerUrl`/`authToken`.
 
 ```typescript
 import {
@@ -42,24 +50,27 @@ import {
   ArweaveBundlerStorageAdapter,
   MidnightChainAdapter,
   PasswordEncryptionAdapter,
-  NetworkId,
-} from "@dstorage-tech/dstorage";
+} from "@dstorage-tech/dstorage/browser";
+
+const signingServerUrl = "https://dstorage.pro";
+const authToken = "your_jwt_token_here";
 
 const sdk = new DStorage({
   storageAdapter: new ArweaveBundlerStorageAdapter({
-    signingServerUrl: process.env.DSTORAGE_SERVICE_URL ?? "https://dstorage.pro",
-    authToken: process.env.DSTORAGE_AUTH_TOKEN ?? "",
+    signingServerUrl,
+    authToken,
   }),
+
   chainAdapter: new MidnightChainAdapter({
-    walletMode: "provider",
-    walletProvider,
-    privateStatePassword,
-    zkArtifactsPath: "/absolute/path/to/artifacts",
-    network: NetworkId.Undeployed,
+    walletMode: "connector",
+    connectorName: "lace",
+    zkConfigBaseUrl: window.location.origin,
+    network: "preprod",
     proofServerEndpoint: "http://localhost:6300",
-    signingServerUrl: process.env.DSTORAGE_SERVICE_URL ?? "https://dstorage.pro",
-    authToken: process.env.DSTORAGE_AUTH_TOKEN ?? "",
+    signingServerUrl,
+    authToken,
   }),
+
   encryptionAdapters: [
     new PasswordEncryptionAdapter({
       password: "Correct-Horse-Battery!",
@@ -69,23 +80,27 @@ const sdk = new DStorage({
 });
 ```
 
-Configuring `signingServerUrl`/`authToken` on `MidnightChainAdapter` sponsors DUST chain fees
-too, the same way it already does for Arweave storage on the `ArweaveBundlerStorageAdapter`
-side: the signing server balances and signs the on-chain transaction on the wallet's behalf, so
-the wallet never needs to hold DUST. This is automatic — no extra configuration beyond
-`signingServerUrl`/`authToken` is required.
+Adding `signingServerUrl`/`authToken` to `MidnightChainAdapter` manages DUST chain fees the same
+way it manages Arweave storage costs on `ArweaveBundlerStorageAdapter`. dStorage Pro balances and
+signs the on-chain transaction instead of the wallet.
 
-The `walletProvider` passed to `MidnightChainAdapter` still needs to be a real wallet object,
-though — it's used to expose the public keys the ZK circuit needs
-(`getCoinPublicKey()`/`getEncryptionPublicKey()`). It just doesn't need to be funded or synced
-with the network, since the signing server handles balancing and signing instead of the wallet.
+The wallet extension is still involved, though — it still connects, still exposes the public keys
+the ZK circuit needs, and still submits the final transaction. It just never needs a DUST balance
+to do any of that.
+
+The same separation of concerns applies on the storage side. `ArweaveBundlerStorageAdapter` never
+sends your content to dStorage Pro — not the raw data, and not even the encrypted bytes. dStorage
+Pro only pays for and signs the Arweave upload. The actual content, still encrypted, is submitted
+directly to the Arweave storage network afterwards, once payment is settled — it never passes
+through dStorage Pro at all.
 
 ## Step 3 — Init, store, retrieve
 
 Same call pattern as every other guide in this series:
 
 ```typescript
-await sdk.init();
+const contractAddress = await sdk.init();
+console.log("DataRegistry contract address:", contractAddress);
 
 const { chainRefId } = await sdk.store(
   new TextEncoder().encode("hello, dStorage"),
@@ -97,27 +112,17 @@ console.log(new TextDecoder().decode(bytes)); // "hello, dStorage"
 
 What's different now that both sides are managed:
 
-- **No AR wallet or JWK file needed client-side** — the signing server holds a funded bundler
-  account and signs Arweave transactions on your behalf.
-- **No DUST-funded Midnight wallet needed either** — the same signing server balances and signs
-  the on-chain reference transaction, sponsoring the chain fee.
+- **No AR wallet or JWK file needed client-side** — dStorage Pro holds a funded bundler account
+  and signs Arweave transactions on your behalf.
+- **No DUST-funded Midnight wallet needed either** — dStorage Pro balances and signs the
+  on-chain reference transaction too, covering the chain fee.
 - **Near-instant finality** on the storage side, via the ANS-104 bundler protocol, instead of
   waiting on Arweave L1.
-- **Privacy is preserved** — only a 48-byte ANS-104 `deep_hash` is sent to the signing server for
-  storage; the file bytes themselves never leave the client.
-
-## Using this from a browser
-
-If you need to call the managed service directly from browser JavaScript (no backend proxy),
-use a **JWT token** instead of a `ds_*` token — it's accepted only on the `sign-tx` endpoint, and
-its origin/spend/request limits are cryptographically enforced:
-
-```typescript
-new ArweaveBundlerStorageAdapter({
-  signingServerUrl: "https://dstorage.pro",
-  authToken: process.env.DSTORAGE_JWT_TOKEN ?? "",
-});
-```
+- **Privacy is preserved on both sides** — for storage, only a 48-byte ANS-104 `deep_hash` is
+  sent to dStorage Pro; the file bytes themselves never leave the client. For chain, only the
+  already-proven Midnight transaction is sent for balancing and signing — thanks to the ZK proof,
+  that transaction reveals nothing about the private data it references, so no content or
+  witness data is ever sent to dStorage Pro for the DUST payment either.
 
 ## Learn More
 

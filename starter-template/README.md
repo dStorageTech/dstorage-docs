@@ -4,7 +4,7 @@ A minimal Node.js/TypeScript project (with a small browser entry for the wallet-
 to follow along with the
 [dStorage SDK docs guides](https://dstorage.pro/docs/guide/) — clone it, run it, then replace
 the code in `src/index.ts` with each guide's snippets as you read through the series (Mock
-Adapters → Core Concepts → Local & Simulator Adapters → Midnight Network Adapter → Managed Adapters).
+Adapters → Core Concepts → Local & Simulator Adapters → Midnight Network Adapter → Managed Payments Service).
 
 ## Prerequisites
 
@@ -40,5 +40,6 @@ dev server, and opens a page (`index.html` + `src/main.ts`) with a **Run** butto
 through the same `init()` → `store()` → `retrieveByRefId()` sequence — see that guide's
 Prerequisites for the proof server, arlocal, and wallet setup it needs first.
 
-[Managed Adapters](https://dstorage.pro/docs/guide/managed-adapters.html) goes back to
-`src/index.ts` / `npm start`, since it targets a Node.js backend.
+[Managed Payments Service](https://dstorage.pro/docs/guide/managed-payments-service.html) builds
+on the same `npm run dev` browser app, adding dStorage Pro's managed signing service so neither
+side needs a funded wallet.

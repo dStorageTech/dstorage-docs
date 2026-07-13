@@ -49,7 +49,10 @@ export default defineConfig({
               text: "Midnight Network Adapter",
               link: "/guide/midnight-network-adapter",
             },
-            { text: "Managed Adapters", link: "/guide/managed-adapters" },
+            {
+              text: "Managed Payments Service",
+              link: "/guide/managed-payments-service",
+            },
           ],
         },
       ],

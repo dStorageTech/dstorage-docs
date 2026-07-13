@@ -45,12 +45,12 @@ you route payments through dStorage Pro's managed service.
 [dStorage Pro](https://dstorage.pro) is a managed service that signs Arweave and Midnight
 transactions on your app's behalf, so end-users never need their own AR wallet or a
 DUST-funded Midnight wallet. Configure it via `signingServerUrl`/`authToken` on the storage and
-chain adapters — see the [Managed Adapters](/guide/managed-adapters) guide for a complete
+chain adapters — see the [Managed Payments Service](/guide/managed-payments-service) guide for a complete
 walkthrough.
 
 - Managed Arweave signing — no AR wallet or JWK key file needed client-side.
 - Near-instant finality via the ANS-104 bundler protocol, instead of Arweave L1's 2–20 minute confirmation wait.
-- Managed Midnight DUST-fee sponsorship — no funded Midnight wallet needed either. See [Managed Adapters](/guide/managed-adapters).
+- Managed Midnight DUST-fee sponsorship — no funded Midnight wallet needed either. See [Managed Payments Service](/guide/managed-payments-service).
 - Privacy-preserving signing — your file bytes never leave the client and are never sent to or seen by the signing server. Only a small cryptographic hash needed to construct the transaction is transmitted; the content itself and your encryption keys are never shared with dStorage Pro.
 - Two token types: `ds_*` secret tokens (full account access, server-side only) and scoped JWT tokens (browser-safe, with origin/spend/request caps and instant revocation).
 - Signing-key pinning — the auth token embeds the server's public key, so a key rotation or substitution is detected immediately.

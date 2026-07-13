@@ -60,7 +60,7 @@ cp -r node_modules/@dstorage-tech/chain/src/adapters/midnight/contracts/dataregi
 ```
 
 This guide keeps `ArweaveLocalStorageAdapter` for storage, to isolate what changes on the chain
-side. Swapping in real Arweave storage is covered in [Managed Adapters](/guide/managed-adapters).
+side. Swapping in real Arweave storage is covered in [Managed Payments Service](/guide/managed-payments-service).
 
 ```typescript
 import {

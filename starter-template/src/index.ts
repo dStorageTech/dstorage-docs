@@ -7,7 +7,7 @@ import {
 
 // This starter matches the "Mock Adapters" guide at https://dstorage.pro/docs/guide/mock-adapters
 // As you move through the other guides in the series (Core Concepts, Local & Simulator
-// Adapters, Midnight Adapters, Managed Adapters), replace the adapters below — the rest of
+// Adapters, Midnight Network Adapter, Managed Payments Service), replace the adapters below — the rest of
 // main() stays the same throughout.
 
 async function main() {

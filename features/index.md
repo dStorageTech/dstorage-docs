@@ -24,13 +24,13 @@ you route payments through dStorage Pro's managed service.
 - `MidnightSimulatorChainAdapter` — real DataRegistry circuit behavior without a live network. See [Local & Simulator Adapters](/guide/local-simulator-adapters).
 - `ArweaveLocalStorageAdapter` with an auto-funded test wallet for local integration testing.
 - Works in both Node.js and the browser, with a dedicated browser entry point.
-- `HttpGatewayChainAdapter` for custom REST backends, for deployments that don't use Midnight.
+- `HttpGatewayChainAdapter` for delegating chain operations to any custom REST/gateway backend instead of talking to a chain directly.
 - TypeScript-first, with strict typing throughout.
 
 ## End-User Features
 
 - Client-side encryption — data is encrypted on-device before it ever leaves.
-- Non-custodial — operators, backend servers, and storage/chain networks never see plaintext.
+- Non-custodial — encryption keys are held only by the user; operators, backend servers, and storage/chain networks never see the user's data or plaintext.
 - A tamper-proof, verifiable on-chain ownership receipt for every upload.
 - Permanent, censorship-resistant decentralised storage.
 - Post-quantum protection options, guarding against "harvest now, decrypt later" threats.
@@ -40,7 +40,7 @@ you route payments through dStorage Pro's managed service.
 - No vendor lock-in — the same data model works across multiple storage and chain providers.
 - Private by default — making data public requires an explicit, clearly-irreversible opt-in.
 
-## dStorage Pro (Managed Services)
+## Managed Payments Service
 
 [dStorage Pro](https://dstorage.pro) is a managed service that signs Arweave and Midnight
 transactions on your app's behalf, so end-users never need their own AR wallet or a
@@ -49,9 +49,13 @@ chain adapters — see the [Managed Payments Service](/guide/managed-payments-se
 walkthrough.
 
 - Managed Arweave signing — no AR wallet or JWK key file needed client-side.
-- Near-instant finality via the ANS-104 bundler protocol, instead of Arweave L1's 2–20 minute confirmation wait.
-- Managed Midnight DUST-fee sponsorship — no funded Midnight wallet needed either. See [Managed Payments Service](/guide/managed-payments-service).
+- Two managed storage-signing options: near-instant finality via the ANS-104 bundler protocol (`ArweaveBundlerStorageAdapter`), or direct Arweave L1 submission (`ArweaveStorageAdapter`) for callers who prefer L1's 2–20 minute confirmation semantics.
+- Managed Midnight DUST-fee payment — no funded Midnight wallet needed either, with sponsorship in some cases. See [Managed Payments Service](/guide/managed-payments-service).
 - Privacy-preserving signing — your file bytes never leave the client and are never sent to or seen by the signing server. Only a small cryptographic hash needed to construct the transaction is transmitted; the content itself and your encryption keys are never shared with dStorage Pro.
 - Two token types: `ds_*` secret tokens (full account access, server-side only) and scoped JWT tokens (browser-safe, with origin/spend/request caps and instant revocation).
 - Signing-key pinning — the auth token embeds the server's public key, so a key rotation or substitution is detected immediately.
 - A `managedmock` test mode for exercising the full managed-payment round trip without real credentials or funds.
+- Balance funding via debit/credit cards, crypto, and stablecoins, or by redeeming a coupon code — with a DUST bonus auto-credited on deposit.
+- A per-account stats dashboard — total requests, success rate, balance spent, and network breakdown, with a 7-day request-activity chart and an all-time network-distribution chart.
+- Unified transaction and payment history — a paginated, filterable feed with a per-transaction breakdown of native network cost vs. service fee, plus live on-chain status tracking (submitted → confirming → confirmed/expired) for non-Midnight transactions.
+- An account-management REST API, separate from the SDK's signing endpoint, for automating balance/profile lookups, stats and history queries, and full CRUD on both secret and JWT API tokens — including per-JWT spend and request caps. See [Managed Payments FAQ](/faq/managed-payments#what-type-of-api-token-do-i-need-to-use-the-managed-service).

@@ -71,8 +71,8 @@ export default defineConfig({
             { text: "Developer Features", link: "/features/#developer-features" },
             { text: "End-User Features", link: "/features/#end-user-features" },
             {
-              text: "dStorage Pro (Managed Services)",
-              link: "/features/#dstorage-pro-managed-services",
+              text: "Managed Payments Service",
+              link: "/features/#managed-payments-service",
             },
           ],
         },

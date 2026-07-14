@@ -12,9 +12,9 @@ Adapters are the pluggable components you pass to `DStorage` to tell it _where_ 
 
 You can supply multiple encryption adapters; any single registered adapter can independently decrypt any upload made while it was in the list.
 
-### `MockStorageAdapter` — in-memory storage for development and testing
+### `MockStorageAdapter`
 
-Stores encrypted bytes in an in-memory `Map` on Node.js or `localStorage` in the browser. No network, no tokens, no Docker required. Generates 43-character base64url `storageId` values in the same format as real Arweave IDs, so code that handles `storageId` values works identically against real and mock storage. Uses a MOCK pricing model for `estimateCost()` calls. Optionally accepts `signingServerUrl` and `authToken` to exercise managed payment request/response round-trips in tests without touching real funds.
+In-memory storage for development and testing. Stores encrypted bytes in an in-memory `Map` on Node.js or `localStorage` in the browser. No network, no tokens, no Docker required. Generates 43-character base64url `storageId` values in the same format as real Arweave IDs, so code that handles `storageId` values works identically against real and mock storage. Uses a MOCK pricing model for `estimateCost()` calls. Optionally accepts `signingServerUrl` and `authToken` to exercise managed payment request/response round-trips in tests without touching real funds.
 
 ```typescript
 const sdk = new DStorage({
@@ -24,9 +24,9 @@ const sdk = new DStorage({
 });
 ```
 
-### `ArweaveStorageAdapter` — permanent Arweave storage
+### `ArweaveStorageAdapter`
 
-Uploads to the Arweave permaweb: pay once, store forever. Signing is handled by the ArConnect browser extension (browser) or a JWK wallet file (Node.js). The adapter tags every upload with a BLAKE3 `X-Content-Hash` and verifies it on retrieval — pass `skipIntegrityCheck: true` only when using a fully trusted private gateway. Uploads are optimistic (HTTP 202); if you need to block until the transaction is confirmed on-chain, set `waitForConfirmation: true` (expect 2–20 minutes). For development against the Arweave testnet, use `gateway: { host: "arweave.dev", port: 443, protocol: "https" }`.
+Permanent Arweave storage. Uploads to the Arweave permaweb: pay once, store forever. Signing is handled by the ArConnect browser extension (browser) or a JWK wallet file (Node.js). The adapter tags every upload with a BLAKE3 `X-Content-Hash` and verifies it on retrieval — pass `skipIntegrityCheck: true` only when using a fully trusted private gateway. Uploads are optimistic (HTTP 202); if you need to block until the transaction is confirmed on-chain, set `waitForConfirmation: true` (expect 2–20 minutes). For development against the Arweave testnet, use `gateway: { host: "arweave.dev", port: 443, protocol: "https" }`.
 
 ```typescript
 // Browser — ArConnect handles signing
@@ -46,9 +46,9 @@ const sdk = new DStorage({
 
 Requires a funded AR wallet. Not suitable for applications where end-users do not hold AR — use `ArweaveBundlerStorageAdapter` instead.
 
-### `ArweaveLocalStorageAdapter` — local Arweave integration testing
+### `ArweaveLocalStorageAdapter`
 
-A drop-in replacement for `ArweaveStorageAdapter` that connects to a local arlocal node (`localhost:1984`) instead of the Arweave mainnet. No real AR tokens are needed. The recommended setup is the `createWithTestWallet()` factory, which generates a fresh JWK wallet and auto-funds it:
+Local Arweave integration testing. A drop-in replacement for `ArweaveStorageAdapter` that connects to a local arlocal node (`localhost:1984`) instead of the Arweave mainnet. No real AR tokens are needed. The recommended setup is the `createWithTestWallet()` factory, which generates a fresh JWK wallet and auto-funds it:
 
 ```typescript
 const { adapter } = await ArweaveLocalStorageAdapter.createWithTestWallet({
@@ -66,9 +66,9 @@ docker run -d --rm -p 1984:1984 textury/arlocal
 # or: npx arlocal
 ```
 
-### `ArweaveBundlerStorageAdapter` — fast finality via managed signing
+### `ArweaveBundlerStorageAdapter`
 
-Uploads via the ANS-104 Arweave bundler, which delivers near-instant finality compared to the 2–20 minute wait for Arweave L1 transactions. The signing server holds a funded bundler account, so end-users need no AR wallet. Privacy is preserved: only a 48-byte ANS-104 `deep_hash` is sent to the server — the file bytes never leave the client.
+Fast finality via managed signing. Uploads via the ANS-104 Arweave bundler, which delivers near-instant finality compared to the 2–20 minute wait for Arweave L1 transactions. The signing server holds a funded bundler account, so end-users need no AR wallet. Privacy is preserved: only a 48-byte ANS-104 `deep_hash` is sent to the server — the file bytes never leave the client.
 
 ```typescript
 const sdk = new DStorage({
@@ -83,9 +83,9 @@ const sdk = new DStorage({
 
 The `authToken` uses the compound `ds_<credential>.<base64url_modulus>` format. The modulus is the server's RSA-4096 public key and is pinned at construction time — if the server rotates its key the adapter immediately detects the mismatch, and the token must be re-issued.
 
-### `MockChainAdapter` — in-memory chain adapter for development and testing
+### `MockChainAdapter`
 
-Stores on-chain references in an in-memory `Map` on Node.js or in `localStorage` in the browser (browser state survives page reloads). Enforces the same SHA-256 `ownerSecret` commitment check as the real DataRegistry contract, so ownership-gated operations (`removeReference`, `updateReference`) behave correctly in tests. `refId` values are UUID-style strings rather than the Bytes<32> format produced by the real circuit. Requires no Midnight node, proof server, indexer, or DUST tokens.
+In-memory chain adapter for development and testing. Stores on-chain references in an in-memory `Map` on Node.js or in `localStorage` in the browser (browser state survives page reloads). Enforces the same SHA-256 `ownerSecret` commitment check as the real DataRegistry contract, so ownership-gated operations (`removeReference`, `updateReference`) behave correctly in tests. `refId` values are UUID-style strings rather than the Bytes<32> format produced by the real circuit. Requires no Midnight node, proof server, indexer, or DUST tokens.
 
 ```typescript
 const sdk = new DStorage({
@@ -95,9 +95,9 @@ const sdk = new DStorage({
 });
 ```
 
-### `HttpGatewayChainAdapter` — remote REST backend
+### `HttpGatewayChainAdapter`
 
-Delegates reference operations to a custom HTTP/HTTPS service instead of a blockchain. Configure it with four paths (write, read, list, delete) appended to a shared `baseUrl`:
+Remote REST backend. Delegates reference operations to a custom HTTP/HTTPS service instead of a blockchain. Configure it with four paths (write, read, list, delete) appended to a shared `baseUrl`:
 
 ```typescript
 new HttpGatewayChainAdapter({
@@ -135,9 +135,9 @@ One important security note: `ownerSecret` is an internal ZK witness that is del
 
 Typical use cases: staging environments backed by a custom database, non-Midnight deployments where a simple REST service is preferable to a blockchain, and integration testing against a real HTTP service.
 
-### `MidnightSimulatorChainAdapter` — real DataRegistry circuits without a live network
+### `MidnightSimulatorChainAdapter`
 
-Runs the actual DataRegistry Compact circuits in-process via `DataRegistrySimulator`. Ownership enforcement, `ownerSecret`/`ownerCommitment` semantics, and `refId` derivation all match the on-chain behavior exactly — unlike `MockChainAdapter`, which uses simplified UUID-style IDs. No Midnight node, indexer, proof server, or DUST tokens are required. Optionally accepts `signingServerUrl` and `authToken` to exercise the managed payment flow end-to-end in tests.
+Real DataRegistry circuits without a live network. Runs the actual DataRegistry Compact circuits in-process via `DataRegistrySimulator`. Ownership enforcement, `ownerSecret`/`ownerCommitment` semantics, and `refId` derivation all match the on-chain behavior exactly — unlike `MockChainAdapter`, which uses simplified UUID-style IDs. No Midnight node, indexer, proof server, or DUST tokens are required. Optionally accepts `signingServerUrl` and `authToken` to exercise the managed payment flow end-to-end in tests.
 
 Use this adapter when you need realistic ZK circuit behavior (correct `refId` format, real commitment checks) in integration tests without standing up Docker infrastructure.
 
@@ -149,9 +149,9 @@ const sdk = new DStorage({
 });
 ```
 
-### `MidnightChainAdapter` — real Midnight network
+### `MidnightChainAdapter`
 
-Connects to the Midnight blockchain (`preprod` or `undeployed`/localhost). Choose a `walletMode` based on your runtime:
+Real Midnight network. Connects to the Midnight blockchain (`preprod` or `undeployed`/localhost). Choose a `walletMode` based on your runtime:
 
 - **`"provider"` (Node.js)**: you build and sync a `WalletFacade` yourself, then pass it as `walletProvider`. Also requires `privateStatePassword` (LevelDB encryption) and optionally `zkArtifactsPath` (absolute path to the `keys/` and `zkir/` directories).
 - **`"connector"` (browser)**: delegates all key management to the Lace wallet extension (`connectorName: "mnLace"`). Requires `zkConfigBaseUrl` set to the base URL from which the ZK artifacts are served.
@@ -181,9 +181,9 @@ new MidnightChainAdapter({
 
 Requires a running Midnight proof server and a wallet funded with DUST.
 
-### `PasswordEncryptionAdapter` — password-derived encryption
+### `PasswordEncryptionAdapter`
 
-Derives a 64-byte KEK from a user-supplied password using scrypt (memory-hard; default: 128 MB RAM per attempt, matching OWASP 2024 recommendations). Because derivation is deterministic, the same `password` and `salt` always produce the same key on any device — no key backup is needed beyond those two values.
+Password-derived encryption. Derives a 64-byte KEK from a user-supplied password using scrypt (memory-hard; default: 128 MB RAM per attempt, matching OWASP 2024 recommendations). Because derivation is deterministic, the same `password` and `salt` always produce the same key on any device — no key backup is needed beyond those two values.
 
 The `salt` is mandatory and must be supplied by the caller. Use an app-scoped domain label (`"myapp:v1"`), a per-user identifier, or a combination. The SDK never supplies a default to avoid silent cross-app key collisions when passwords are reused. Passwords are validated at construction: minimum 12 characters, at least 3 of 4 character classes (uppercase, lowercase, digits, special), no sequential runs, and at least 60 bits of estimated entropy.
 
@@ -199,9 +199,9 @@ new PasswordEncryptionAdapter({
 
 Post-quantum note: human-chosen passwords rarely reach 256-bit entropy. For full post-quantum safety at the key layer, use `KeypairEncryptionAdapter`.
 
-### `MnemonicEncryptionAdapter` — BIP-39 mnemonic or hex seed
+### `MnemonicEncryptionAdapter`
 
-Derives a KEK via HKDF from a BIP-39 seed phrase or a raw 64-byte hex seed. Requires a 24-word mnemonic — 12-word phrases are rejected at construction because they provide only 64-bit post-quantum security (below NIST's 128-bit minimum). With 24 words the adapter is unconditionally post-quantum safe. The raw seed bytes are imported into a non-extractable `CryptoKey` and zeroed from the JS heap immediately — they are never readable from JavaScript after construction. Like `PasswordEncryptionAdapter`, derivation is deterministic: the same mnemonic always recovers the same key on any device.
+BIP-39 mnemonic or hex seed. Derives a KEK via HKDF from a BIP-39 seed phrase or a raw 64-byte hex seed. Requires a 24-word mnemonic — 12-word phrases are rejected at construction because they provide only 64-bit post-quantum security (below NIST's 128-bit minimum). With 24 words the adapter is unconditionally post-quantum safe. The raw seed bytes are imported into a non-extractable `CryptoKey` and zeroed from the JS heap immediately — they are never readable from JavaScript after construction. Like `PasswordEncryptionAdapter`, derivation is deterministic: the same mnemonic always recovers the same key on any device.
 
 ```typescript
 new MnemonicEncryptionAdapter({ mnemonic: "word1 word2 … word24" });
@@ -211,9 +211,9 @@ new MnemonicEncryptionAdapter({
 });
 ```
 
-### `KeypairEncryptionAdapter` — ML-KEM768 asymmetric wrapping
+### `KeypairEncryptionAdapter`
 
-Uses CRYSTALS-Kyber (ML-KEM, NIST FIPS 203) for asymmetric DEK encapsulation. The default variant is `mlkem768` (192-bit post-quantum security); `mlkem512` (128-bit) and `mlkem1024` (256-bit) are also available.
+ML-KEM768 asymmetric wrapping. Uses CRYSTALS-Kyber (ML-KEM, NIST FIPS 203) for asymmetric DEK encapsulation. The default variant is `mlkem768` (192-bit post-quantum security); `mlkem512` (128-bit) and `mlkem1024` (256-bit) are also available.
 
 The asymmetric design enables upload-only parties: an uploader who holds only the public key can wrap a DEK, but cannot unwrap it — decryption requires the secret key. This is useful for delegated upload scenarios where the client should not be able to read back what it stored.
 

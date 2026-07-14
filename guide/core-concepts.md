@@ -63,4 +63,4 @@ walk through those combinations.
 
 ## Learn More
 
-- Browse the [FAQ](/faq/concepts) for more depth on any of these topics, including [encryption & security](/faq/encryption-security).
+- Browse the [FAQ](/faq/concepts#concepts-features) for more depth on any of these topics, including [encryption & security](/faq/encryption-security#encryption-security).

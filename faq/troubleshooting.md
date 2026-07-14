@@ -17,10 +17,6 @@ The chain adapter's `_getAPI()` is called before `init()` completes, hitting an 
 - **Node.js**: verify `zkArtifactsPath` points to the directory containing `keys/` and `zkir/` sub-directories, not to a JS file or parent directory.
 - **Browser**: confirm the artifacts were copied into `public/` and that `zkConfigBaseUrl` is set.
 
-### `ledger-v8` type conflicts
-
-`ledger-v8` must be pinned to `8.0.3` in the chain package. Versions `8.0.x` above that or mismatched peer dependencies cause type incompatibilities. Check `packages/chain/package.json` and the root lockfile.
-
 ### Wallet extension not detected in browser connector mode
 
 Confirm the Lace extension (≥ 1.36.2) is installed and enabled in your browser. The connector flow calls `window.midnight.mnLace.enable()` — if the extension is absent or not enabled the call rejects. Reload the page after installing/enabling the extension.

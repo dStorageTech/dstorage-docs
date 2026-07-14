@@ -33,7 +33,7 @@ Tokens come in two flavors:
 - **`ds_*` secret token** — full account access (manage other tokens, payment history). Server-side
   only — never ship one in browser JavaScript. Use this instead if you're proxying requests
   through your own Node.js backend rather than calling dStorage Pro directly from the browser;
-  see the [full adapter reference](/faq/adapters) for that setup.
+  see the [full adapter reference](/faq/adapters#adapters) for that setup.
 
 Copy your JWT token from the dStorage Pro portal — you'll paste it directly into the adapter
 config in Step 2.
@@ -130,7 +130,7 @@ You've reached the end of the adapter progression — from fully in-memory Mock 
 local/simulator adapters, to a real Midnight network with fully managed Arweave and DUST
 payments. From here:
 
-- Browse the [FAQ](/faq/managed-payments) for the full managed-payments reference, including
+- Browse the [FAQ](/faq/managed-payments#managed-payments-dstorage-pro) for the full managed-payments reference, including
   token scoping and security notes.
-- The [full adapter reference](/faq/adapters) covers every adapter combination, including ones
+- The [full adapter reference](/faq/adapters#adapters) covers every adapter combination, including ones
   not shown in these guides.

@@ -108,4 +108,4 @@ What's different from Mock under the hood:
 
 ## Learn More
 
-- Browse the [FAQ](/faq/adapters) for the full adapter reference.
+- Browse the [FAQ](/faq/adapters#adapters) for the full adapter reference.

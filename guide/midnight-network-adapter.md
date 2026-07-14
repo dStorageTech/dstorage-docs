@@ -42,7 +42,7 @@ docker stop $(docker ps -q --filter ancestor=midnightntwrk/proof-server:8.1.0)
 `MidnightChainAdapter` takes a `walletMode`, which depends on where your code runs:
 
 - **`"provider"`** (Node.js) — you build, start, and sync a `WalletFacade` yourself and pass it
-  in. Useful for backend services; see the [full adapter reference](/faq/adapters) if you need
+  in. Useful for backend services; see the [full adapter reference](/faq/adapters#adapters) if you need
   this instead.
 - **`"connector"`** (browser) — delegates wallet/key management to a Midnight-compatible wallet
   extension (Lace by default, but any wallet implementing the dApp Connector API works). This is
@@ -138,4 +138,4 @@ What's different now that you're on a live network:
 
 ## Learn More
 
-- Browse the FAQ for more on [deployment & configuration](/faq/deployment-configuration) and the [full adapter reference](/faq/adapters).
+- Browse the FAQ for more on [deployment & configuration](/faq/deployment-configuration#deployment-configuration) and the [full adapter reference](/faq/adapters#adapters).

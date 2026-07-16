@@ -14,7 +14,8 @@ changes:
 
 - Node.js 22 or later, to run the Vite dev server
 - Docker, to run the Midnight proof server
-- [Lace](https://www.lace.io) wallet extension (version 2.0 or later), switched to the Preprod
+- [1AM](https://1am.xyz) wallet extension (latest version) — or [Lace](https://www.lace.io),
+  or any other wallet implementing the dApp Connector API — switched to the Preprod
   network — your wallet still connects to expose public keys and submit transactions, but it no
   longer needs to hold any DUST
 - ~~arlocal~~ — not needed anymore; this guide uses real Arweave via dStorage Pro's bundler
@@ -63,7 +64,7 @@ const sdk = new DStorage({
 
   chainAdapter: new MidnightChainAdapter({
     walletMode: "connector",
-    connectorName: "lace",
+    connectorName: "1am",
     zkConfigBaseUrl: window.location.origin,
     network: "preprod",
     proofServerEndpoint: "http://localhost:6300",

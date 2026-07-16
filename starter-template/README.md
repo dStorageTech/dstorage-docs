@@ -29,7 +29,7 @@ guide swaps in a different combination of adapters, but the overall shape of `ma
 configure, `init()`, `store()`, `retrieveByRefId()`, `destroy()` — stays the same.
 
 [Midnight Network Adapter](https://dstorage.pro/docs/guide/midnight-network-adapter.html) runs
-in the browser instead, since it connects to the Lace wallet extension:
+in the browser instead, since it connects to a Midnight wallet extension (1AM by default, or Lace):
 
 ```bash
 npm run dev

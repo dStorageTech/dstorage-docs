@@ -19,7 +19,7 @@ The chain adapter's `_getAPI()` is called before `init()` completes, hitting an 
 
 ### Wallet extension not detected in browser connector mode
 
-Confirm the Lace extension (≥ 1.36.2) is installed and enabled in your browser. The connector flow calls `window.midnight.mnLace.enable()` — if the extension is absent or not enabled the call rejects. Reload the page after installing/enabling the extension.
+Confirm a Midnight wallet extension (1AM, Lace, or another wallet implementing the dApp Connector API) is installed and enabled in your browser. The connector flow enumerates `window.midnight` and calls `connect()` on the discovered wallet — if no extension is installed or enabled, this call rejects. Reload the page after installing/enabling the extension.
 
 ### Integration tests stall or never complete
 

@@ -11,7 +11,8 @@ and a real proof server. It's the first guide in this series that talks to live 
 - Docker, to run the Midnight proof server
 - [arlocal](https://github.com/textury/arlocal) — a local Arweave-compatible node, still running
   from [Step 1 of the Local & Simulator Adapters guide](/guide/local-simulator-adapters#step-1-—-start-arlocal)
-- [Lace](https://www.lace.io) wallet extension (version 2.0 or later), **switched to the
+- [1AM](https://1am.xyz) wallet extension (latest version) — or [Lace](https://www.lace.io),
+  or any other wallet implementing the dApp Connector API — **switched to the
   Preprod network in its own settings** — this guide runs in the browser and connects to it
   directly, and a wallet only exposes addresses for the network it's currently set to
 - A Midnight wallet funded with DUST — for local development, request test tokens from the
@@ -45,8 +46,8 @@ docker stop $(docker ps -q --filter ancestor=midnightntwrk/proof-server:8.1.0)
   in. Useful for backend services; see the [full adapter reference](/faq/adapters#adapters) if you need
   this instead.
 - **`"connector"`** (browser) — delegates wallet/key management to a Midnight-compatible wallet
-  extension (Lace by default, but any wallet implementing the dApp Connector API works). This is
-  what the rest of this guide uses.
+  extension (1AM by default, but Lace or any other wallet implementing the dApp Connector API
+  works too). This is what the rest of this guide uses.
 
 Connector mode fetches the compiled `DataRegistry` contract's ZK artifacts (`keys/` and `zkir/`)
 over HTTP from your app's own origin, instead of reading them from disk. Copy them from the
@@ -76,7 +77,7 @@ const { adapter: storageAdapter } = await ArweaveLocalStorageAdapter.createWithT
 
 const chainAdapter = new MidnightChainAdapter({
   walletMode: "connector",
-  connectorName: "lace", // window.midnight.lace — omit to use whichever wallet is found first
+  connectorName: "1am", // matches window.midnight['1am'] by injected key or wallet name — omit to use whichever wallet is found first
   zkConfigBaseUrl: window.location.origin, // serves the keys/ and zkir/ you copied to public/
   network: "preprod", // matches the Preprod Faucet used to fund your wallet
   proofServerEndpoint: "http://localhost:6300",

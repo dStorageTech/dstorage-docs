@@ -5,7 +5,7 @@
 - Node.js 22+, npm
 - Docker (for Midnight proof server and Arweave Local)
 - Midnight Compact compiler v0.31.1 (for recompiling the contract)
-- Lace wallet extension ≥ 1.36.2 (browser connector flows only)
+- 1AM wallet extension (latest version) — or Lace, or another dApp Connector-compatible wallet (browser connector flows only)
 - Wander wallet extension (Arweave browser flows only)
 
 ### How do I start the local Midnight proof server?
@@ -40,8 +40,8 @@ Use the `walletMode` discriminated union:
   zkArtifactsPath,      // optional: absolute path to keys/ and zkir/ dirs
 }
 
-// Browser (connector mode) — delegates to a wallet extension (Lace)
-{ walletMode: "connector", connectorName: "mnLace", zkConfigBaseUrl: window.location.origin }
+// Browser (connector mode) — delegates to a wallet extension (1AM, Lace, or another dApp Connector wallet)
+{ walletMode: "connector", connectorName: "1am", zkConfigBaseUrl: window.location.origin }
 ```
 
 `walletMode` is required. See `QUICK_START.md` for a complete provider-mode setup example.

@@ -260,4 +260,4 @@ Node.js 22 or later.
 
 ### Does the SDK work in the browser?
 
-Yes, with some constraints. Use the browser entry point (`@dstorage/chain/browser`) which excludes Node.js-only adapters. Set `walletMode: "connector"` in `MidnightChainAdapter` to use the Lace browser extension. Pass `zkConfigBaseUrl: window.location.origin` so ZK artifacts are fetched over HTTP from the `public/` directory rather than read from disk.
+Yes, with some constraints. Use the browser entry point (`@dstorage/chain/browser`) which excludes Node.js-only adapters. Set `walletMode: "connector"` in `MidnightChainAdapter` to use a browser wallet extension (1AM by default, or Lace, or any other wallet implementing the dApp Connector API). Pass `zkConfigBaseUrl: window.location.origin` so ZK artifacts are fetched over HTTP from the `public/` directory rather than read from disk.

@@ -154,7 +154,7 @@ const sdk = new DStorage({
 Real Midnight network. Connects to the Midnight blockchain (`preprod` or `undeployed`/localhost). Choose a `walletMode` based on your runtime:
 
 - **`"provider"` (Node.js)**: you build and sync a `WalletFacade` yourself, then pass it as `walletProvider`. Also requires `privateStatePassword` (LevelDB encryption) and optionally `zkArtifactsPath` (absolute path to the `keys/` and `zkir/` directories).
-- **`"connector"` (browser)**: delegates all key management to the Lace wallet extension (`connectorName: "mnLace"`). Requires `zkConfigBaseUrl` set to the base URL from which the ZK artifacts are served.
+- **`"connector"` (browser)**: delegates all key management to a Midnight wallet extension — 1AM by default (`connectorName: "1am"`), though Lace or any other wallet implementing the dApp Connector API also works. Requires `zkConfigBaseUrl` set to the base URL from which the ZK artifacts are served.
 
 `init()` either deploys a fresh DataRegistry contract or, if you pass `contractAddress`, reconnects to an existing one. Save the returned address across runs to avoid redeploying. DUST chain fees are handled internally by the connected wallet — no explicit payment config is needed. Optionally pass `signingServerUrl` and `authToken` to route Midnight transaction balancing through dStorage Pro instead of the local wallet.
 
@@ -172,7 +172,7 @@ new MidnightChainAdapter({
 // Browser (connector mode)
 new MidnightChainAdapter({
   walletMode: "connector",
-  connectorName: "mnLace",
+  connectorName: "1am",
   zkConfigBaseUrl: window.location.origin,
   network: NetworkId.TestNet,
   proofServerEndpoint: "http://localhost:6300",

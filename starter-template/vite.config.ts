@@ -12,14 +12,21 @@ import { viteCommonjs } from "@originjs/vite-plugin-commonjs";
 export default defineConfig({
   resolve: {
     alias: {
-      // The compiled SDK bundle imports this shim path directly (baked in by
-      // its own build, expecting vite-plugin-node-polyfills to provide it).
-      // @dstorage-tech/* deps are `file:` links into ../dstorage-sdk, a
-      // separate node_modules tree that doesn't have this plugin installed —
-      // force resolution to this project's own copy via an absolute path.
+      // The compiled SDK bundle imports these shim paths directly (baked in
+      // by its own build, expecting vite-plugin-node-polyfills to provide
+      // them). @dstorage-tech/* deps are `file:` links into ../dstorage-sdk,
+      // a separate node_modules tree that doesn't have this plugin
+      // installed — force resolution to this project's own copy via an
+      // absolute path.
       "vite-plugin-node-polyfills/shims/buffer": fileURLToPath(
         new URL(
           "./node_modules/vite-plugin-node-polyfills/shims/buffer/dist/index.js",
+          import.meta.url,
+        ),
+      ),
+      "vite-plugin-node-polyfills/shims/global": fileURLToPath(
+        new URL(
+          "./node_modules/vite-plugin-node-polyfills/shims/global/dist/index.js",
           import.meta.url,
         ),
       ),

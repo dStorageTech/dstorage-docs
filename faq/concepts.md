@@ -21,6 +21,10 @@ An on-chain reference is a tamper-proof record written to the Midnight blockchai
 - **Off-chain (Arweave)**: the encrypted data payload.
 - **On-chain (Midnight DataRegistry contract)**: an encrypted storage pointer (`storageId`), an encrypted key envelope (`keyEnvelope`), the encryption scheme label, and optional public metadata. Raw user data and plaintext keys never appear on-chain.
 
+### What happens, step by step, when I call `store()`?
+
+Your data is encrypted on-device, then (if a payment adapter is configured) the storage payment is made, the encrypted blob is uploaded to the storage network, the chain payment is made (if applicable), and finally the encrypted pointer is written on-chain as a reference. `store()` returns a `storageId` (the storage-network pointer) and, when a chain adapter is configured, a `chainRefId` (the on-chain reference handle).
+
 ### Can dStorage operators read my data?
 
 No. Encryption happens on the user's device using keys derived locally. The managed payment service (`dstorage.pro`) only receives a cryptographic hash — never content. The storage network (Arweave) holds ciphertext. No party in the pipeline holds an unencrypted copy.

@@ -11,7 +11,7 @@ you route payments through dStorage Pro's managed service.
 - Multi-key encryption — register multiple encryption adapters (e.g. a password plus a recovery mnemonic); any one can independently decrypt.
 - Key rotation (`rotateKeys()`) — add or remove encryption adapters without re-uploading content.
 - `generatePqsPassword()` — a cryptographically random, machine-generated password for full post-quantum protection at the key-encapsulation layer.
-- Automatic large-file chunking — files over 10 MB are transparently split into independently encrypted chunks. See [Architecture](/architecture/).
+- Automatic large-file chunking — files over 10 MB are transparently split into independently encrypted chunks. See [FAQ: Concepts & Features](/faq/concepts#does-dstorage-support-large-files).
 - Storage-only mode — omit `chainAdapter` to skip on-chain references entirely.
 - Explicit public-mode opt-in (`isPublic: true`) for world-readable content — never the default.
 - On-chain BLAKE3 content-hash verification on every `retrieve()` call, detecting storage-layer tampering.

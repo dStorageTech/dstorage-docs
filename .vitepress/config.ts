@@ -29,7 +29,6 @@ export default defineConfig({
     nav: [
       { text: "Guide", link: "/guide/" },
       { text: "Features", link: "/features/" },
-      { text: "Architecture", link: "/architecture/" },
       { text: "FAQ", link: "/faq/" },
     ],
 
@@ -57,12 +56,6 @@ export default defineConfig({
         },
       ],
       "/faq/": buildFaqSidebar(),
-      "/architecture/": [
-        {
-          text: "Architecture",
-          items: [{ text: "Overview", link: "/architecture/" }],
-        },
-      ],
       "/features/": [
         {
           text: "Features",

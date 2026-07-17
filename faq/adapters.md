@@ -159,12 +159,22 @@ Real Midnight network. Connects to the Midnight blockchain (`preprod` or `undepl
 `init()` either deploys a fresh DataRegistry contract or, if you pass `contractAddress`, reconnects to an existing one. Save the returned address across runs to avoid redeploying. DUST chain fees are handled internally by the connected wallet — no explicit payment config is needed. Optionally pass `signingServerUrl` and `authToken` to route Midnight transaction balancing through dStorage Pro instead of the local wallet.
 
 ```typescript
+import { createRequire } from "node:module";
+import path from "node:path";
+
+// The compiled DataRegistry ZK artifacts ship inside the SDK package itself —
+// resolve the bundled copy via its package.json rather than hardcoding a path.
+const zkArtifactsPath = path.join(
+  path.dirname(createRequire(import.meta.url).resolve("@dstorage-tech/dstorage-sdk/package.json")),
+  "dist/contracts/dataregistry/managed",
+);
+
 // Node.js (provider mode)
 new MidnightChainAdapter({
   walletMode: "provider",
   walletProvider, // pre-built, synced AdapterWalletProvider
   privateStatePassword,
-  zkArtifactsPath: "/absolute/path/to/artifacts",
+  zkArtifactsPath,
   network: NetworkId.Undeployed,
   proofServerEndpoint: "http://localhost:6300",
 });

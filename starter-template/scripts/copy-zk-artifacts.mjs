@@ -9,7 +9,7 @@ import { fileURLToPath } from "node:url";
 const rootDir = path.dirname(path.dirname(fileURLToPath(import.meta.url)));
 const managedDir = path.join(
   rootDir,
-  "node_modules/@dstorage-tech/chain/src/adapters/midnight/contracts/dataregistry/managed",
+  "node_modules/@dstorage-tech/dstorage-sdk/dist/contracts/dataregistry/managed",
 );
 
 for (const dir of ["keys", "zkir"]) {

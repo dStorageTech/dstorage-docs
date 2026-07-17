@@ -56,8 +56,8 @@ installed SDK package into Vite's `public/` directory so they're served alongsid
 `scripts/copy-zk-artifacts.mjs`):
 
 ```sh
-cp -r node_modules/@dstorage-tech/chain/src/adapters/midnight/contracts/dataregistry/managed/keys public/keys
-cp -r node_modules/@dstorage-tech/chain/src/adapters/midnight/contracts/dataregistry/managed/zkir public/zkir
+cp -r node_modules/@dstorage-tech/dstorage-sdk/dist/contracts/dataregistry/managed/keys public/keys
+cp -r node_modules/@dstorage-tech/dstorage-sdk/dist/contracts/dataregistry/managed/zkir public/zkir
 ```
 
 This guide keeps `ArweaveLocalStorageAdapter` for storage, to isolate what changes on the chain

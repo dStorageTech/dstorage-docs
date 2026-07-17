@@ -37,7 +37,8 @@ Use the `walletMode` discriminated union:
   walletMode: "provider",
   walletProvider,       // AdapterWalletProvider built and synced by the app
   privateStatePassword, // password for local LevelDB state encryption
-  zkArtifactsPath,      // optional: absolute path to keys/ and zkir/ dirs
+  zkArtifactsPath,      // optional: absolute path to keys/ and zkir/ dirs — the SDK
+                         // ships its own compiled copy (see below), no separate compile needed
 }
 
 // Browser (connector mode) — delegates to a wallet extension (1AM, Lace, or another dApp Connector wallet)
@@ -73,8 +74,21 @@ Omit `contractAddress` to deploy a new contract on first `init()`.
 
 ### Where do ZK artifacts live and how are they served?
 
-- **Node.js**: pass an absolute path via `zkArtifactsPath`. The adapter reads `keys/` and `zkir/` from that directory.
-- **Browser**: copy `keys/` and `zkir/` into your application's public assets directory, then pass `zkConfigBaseUrl: window.location.origin`. Artifacts are fetched over HTTP.
+`DataRegistry` is dStorage's own fixed contract — not something you compile yourself. Its
+compiled ZK artifacts (prover/verifier keys and ZKIR) ship inside the
+`@dstorage-tech/dstorage-sdk` package at `dist/contracts/dataregistry/managed/{keys,zkir}`.
+
+- **Node.js**: pass an absolute path via `zkArtifactsPath`. The adapter reads `keys/` and `zkir/` from that directory. Resolve the bundled copy via the package's own `package.json` rather than hardcoding a `node_modules` path:
+  ```typescript
+  import { createRequire } from "node:module";
+  import path from "node:path";
+
+  const zkArtifactsPath = path.join(
+    path.dirname(createRequire(import.meta.url).resolve("@dstorage-tech/dstorage-sdk/package.json")),
+    "dist/contracts/dataregistry/managed",
+  );
+  ```
+- **Browser**: copy `keys/` and `zkir/` from `node_modules/@dstorage-tech/dstorage-sdk/dist/contracts/dataregistry/managed/` into your application's public assets directory, then pass `zkConfigBaseUrl: window.location.origin`. Artifacts are fetched over HTTP. (The `starter-template`'s `npm run dev` does this automatically — see `scripts/copy-zk-artifacts.mjs`.)
 
 ### What environment variables does the integration test suite need?
 

@@ -51,7 +51,7 @@ import {
   ArweaveBundlerStorageAdapter,
   MidnightChainAdapter,
   PasswordEncryptionAdapter,
-} from "@dstorage-tech/dstorage/browser";
+} from "@dstorage-tech/dstorage-sdk/browser";
 
 const signingServerUrl = "https://dstorage.pro";
 const authToken = "your_jwt_token_here";

@@ -60,7 +60,7 @@ import {
   ArweaveLocalStorageAdapter,
   MidnightSimulatorChainAdapter,
   PasswordEncryptionAdapter,
-} from "@dstorage-tech/dstorage";
+} from "@dstorage-tech/dstorage-sdk";
 
 const { adapter: storageAdapter } = await ArweaveLocalStorageAdapter.createWithTestWallet({
   fundAr: 5, // amount of test AR to fund the generated wallet with

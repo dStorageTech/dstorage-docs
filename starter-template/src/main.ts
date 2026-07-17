@@ -3,7 +3,7 @@ import {
   ArweaveLocalStorageAdapter,
   MidnightChainAdapter,
   PasswordEncryptionAdapter,
-} from "@dstorage-tech/dstorage/browser";
+} from "@dstorage-tech/dstorage-sdk";
 
 // This entry matches the "Midnight Network Adapter" guide at
 // https://dstorage.pro/docs/guide/midnight-network-adapter

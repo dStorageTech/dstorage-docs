@@ -10,8 +10,7 @@
     "dev": "vite"
   },
   "dependencies": {
-    "@dstorage-tech/chain": "file:../dstorage-sdk/packages/chain",
-    "@dstorage-tech/dstorage": "file:../dstorage-sdk/packages/core"
+    "@dstorage-tech/dstorage-sdk": "^0.0.2"
   },
   "devDependencies": {
     "@originjs/vite-plugin-commonjs": "^1.0.3",

@@ -3,7 +3,7 @@ import {
   MockStorageAdapter,
   MockChainAdapter,
   PasswordEncryptionAdapter,
-} from "@dstorage-tech/dstorage";
+} from "@dstorage-tech/dstorage-sdk";
 
 // This starter matches the "Mock Adapters" guide at https://dstorage.pro/docs/guide/mock-adapters
 // As you move through the other guides in the series (Core Concepts, Local & Simulator

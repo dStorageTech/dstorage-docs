@@ -17,7 +17,7 @@ Fast track: clone [`starter-template`](https://github.com/dStorageTech/dstorage-
 ## Install
 
 ```sh
-npm install @dstorage-tech/dstorage
+npm install @dstorage-tech/dstorage-sdk
 ```
 
 ## Step 1 — Configure the SDK
@@ -37,7 +37,7 @@ import {
   MockStorageAdapter,
   MockChainAdapter,
   PasswordEncryptionAdapter,
-} from "@dstorage-tech/dstorage";
+} from "@dstorage-tech/dstorage-sdk";
 
 const sdk = new DStorage({
   storageAdapter: new MockStorageAdapter(),

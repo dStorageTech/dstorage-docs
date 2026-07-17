@@ -17,7 +17,7 @@ import {
   DStorage,
   ArweaveBundlerStorageAdapter,
   MidnightChainAdapter,
-} from "@dstorage-tech/dstorage";
+} from "@dstorage-tech/dstorage-sdk";
 
 const sdk = new DStorage({
   storageAdapter: new ArweaveBundlerStorageAdapter({

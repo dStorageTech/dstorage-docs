@@ -8,7 +8,7 @@ import {
   MockStorageAdapter,
   MockChainAdapter,
   PasswordEncryptionAdapter,
-} from "@dstorage-tech/dstorage";
+} from "@dstorage-tech/dstorage-sdk";
 
 const sdk = new DStorage({
   storageAdapter: new MockStorageAdapter(),
@@ -63,7 +63,7 @@ function handleLogout() {
 `store()` throws a `StorePartialError` (a `DStorageError` subclass) that includes a `recovery` object with the information needed to retry only the chain write, without re-uploading:
 
 ```typescript
-import { isStorePartialError } from "@dstorage-tech/dstorage";
+import { isStorePartialError } from "@dstorage-tech/dstorage-sdk";
 
 // Reactive recovery — catch the error:
 try {

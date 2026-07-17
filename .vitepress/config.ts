@@ -86,6 +86,11 @@ export default defineConfig({
         link: "https://www.linkedin.com/showcase/dstorage-tech",
         ariaLabel: "LinkedIn",
       },
+      {
+        icon: "github",
+        link: "https://github.com/dStorageTech",
+        ariaLabel: "GitHub",
+      },
     ],
   },
 });

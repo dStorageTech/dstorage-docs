@@ -7,10 +7,11 @@
   "scripts": {
     "start": "tsx src/index.ts",
     "predev": "node scripts/copy-zk-artifacts.mjs",
-    "dev": "vite"
+    "dev": "vite",
+    "build": "vite build"
   },
   "dependencies": {
-    "@dstorage-tech/dstorage-sdk": "^0.0.4"
+    "@dstorage-tech/dstorage-sdk": "^0.0.5"
   },
   "devDependencies": {
     "@originjs/vite-plugin-commonjs": "^1.0.3",

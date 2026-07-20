@@ -1,5 +1,8 @@
 import { defineConfig } from "vitepress";
+import type { HeadConfig } from "vitepress";
 import { buildFaqSidebar } from "./faqSidebar";
+
+const GA_MEASUREMENT_ID = "G-Z4HN3WGRBY";
 
 export default defineConfig({
   title: "dStorage SDK",
@@ -23,6 +26,28 @@ export default defineConfig({
       },
     ],
   ],
+
+  // GA4 is only wired up for the docs landing page (`index.md`) for now, not site-wide.
+  transformHead({ page }): HeadConfig[] {
+    if (page !== "index.md") return [];
+    return [
+      [
+        "script",
+        {
+          async: "",
+          src: `https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`,
+        },
+      ],
+      [
+        "script",
+        {},
+        `window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '${GA_MEASUREMENT_ID}');`,
+      ],
+    ];
+  },
 
   themeConfig: {
     siteTitle: false,

@@ -43,3 +43,10 @@ rsync -a --delete .vitepress/dist/ <path-to-your-hosting-repo>/public/docs/
 (For example, if your hosting repo is checked out as a sibling directory, that path might look
 like `../your-hosting-repo/public/docs/`.) This only touches the `docs/` subfolder; it doesn't
 touch the rest of the hosting site's assets.
+
+### Google Analytics (GA4)
+
+The landing page (`index.md`) carries a GA4 tag (`gtag.js`, measurement ID `G-Z4HN3WGRBY`)
+injected via the `transformHead` hook in `.vitepress/config.ts`, scoped to that one page. It's
+part of the build output, not something to hand-edit in `.vitepress/dist/` or the deployed
+`public/docs/index.html` — those get overwritten on every rebuild/copy.

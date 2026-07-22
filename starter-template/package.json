@@ -13,6 +13,9 @@
   "dependencies": {
     "@dstorage-tech/dstorage-sdk": "^0.0.6"
   },
+  "overrides": {
+    "axios": "^1.18.1"
+  },
   "devDependencies": {
     "@originjs/vite-plugin-commonjs": "^1.0.3",
     "tsx": "^4.21.0",

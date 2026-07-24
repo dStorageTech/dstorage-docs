@@ -35,7 +35,7 @@ Mock adapters are fully in-memory — no network, no Docker, no tokens required.
 
 Yes, calling `destroy()` is strongly recommended whenever the user logs out, navigates away, or the SDK instance is no longer needed. It immediately wipes all sensitive in-memory state:
 
-- **Encryption providers** — the live `EncryptionAdapter` instances holding derived KEKs
+- **Encryption providers** — calls each configured `EncryptionAdapter`'s own `destroy()` method (for adapters that implement it, e.g. `KeypairEncryptionAdapter` zeroes its secret key bytes) before dropping the SDK's references to them
 - **Wallet reference** — the in-memory wallet info including the raw seed used to derive keys
 - **Initialized flag** — prevents accidental further use of a stale instance
 
@@ -131,8 +131,6 @@ const estimate = await sdk.estimateCost(bytes.byteLength);
 // { storageCost: { amount, token }, chainCost: { amount, token }, fileSizeBytes }
 ```
 
-`executeMetaTransaction()` is a higher-level wrapper that runs the entire pipeline (estimate → encrypt → pay → upload → write reference) and emits progress events at each step.
-
 ### How do I pass metadata to an upload?
 
 Use the second argument to `store()`:
@@ -171,7 +169,7 @@ npm run test:integration -- -t "full stack"
 new PasswordEncryptionAdapter({
   password: "dstorage-test-passphrase-v1!",
   salt: "test-salt",
-  params: { N: 1024, r: 8, p: 1 }, // fast for tests — never use in production
+  params: { N: 32768, r: 8, p: 1 }, // minimum allowed N — fastest params tests can use
 });
 ```
 
@@ -186,10 +184,6 @@ Run `npm run build` from the repo root — it respects this order. After modifyi
 ### Can I integrate dStorage into an existing Midnight app?
 
 Yes. See `QUICK_START.md` for a step-by-step guide that wires dStorage into the [Midnight Bulletin Board](https://github.com/midnightntwrk/example-bboard) example app, reusing its existing wallet and proof server.
-
-### What is `executeMetaTransaction()` and when should I use it?
-
-It is a convenience wrapper that runs the full upload pipeline atomically and fires a progress callback at each step (`estimate` → `encrypt` → `payment_storage` → `upload` → `chain_reference` → `complete`). Use it when you want a single entry point and progress reporting. Use `store()` directly when you need fine-grained control.
 
 ### How do I update the content stored at an existing reference?
 

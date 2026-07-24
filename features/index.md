@@ -14,11 +14,10 @@ you route payments through dStorage Pro's managed service.
 - Automatic large-file chunking — files over 10 MB are transparently split into independently encrypted chunks. See [FAQ: Concepts & Features](/faq/concepts#does-dstorage-support-large-files).
 - Storage-only mode — omit `chainAdapter` to skip on-chain references entirely.
 - Explicit public-mode opt-in (`isPublic: true`) for world-readable content — never the default.
-- On-chain BLAKE3 content-hash verification on every `retrieve()` call, detecting storage-layer tampering.
+- Chain-anchored BLAKE3 content-hash verification on every `retrieve()` call — the hash comes from the on-chain reference rather than the storage gateway itself, so it detects tampering even by a gateway that controls both the returned bytes and its own metadata.
 - AAD-bound ciphertexts — payloads, manifests, chunks, and storage pointers are each bound to their role, preventing substitution attacks.
 - Partial-failure recovery — `StorePartialError` and `onProgress` recovery payloads let you retry just the on-chain write if it fails after a successful upload.
 - In-place content updates (`update()`) that preserve the `refId`.
-- `executeMetaTransaction()` — a single-call pipeline wrapper with step-by-step progress events.
 - `listReferences()` and `removeReference()`, the latter backed by a ZK ownership proof.
 - Fully in-memory Mock adapters — no network, Docker, or tokens required for local development.
 - `MidnightSimulatorChainAdapter` — real DataRegistry circuit behavior without a live network. See [Local & Simulator Adapters](/guide/local-simulator-adapters).

@@ -83,6 +83,8 @@ const sdk = new DStorage({
 
 The `authToken` uses the compound `ds_<credential>.<base64url_modulus>` format. The modulus is the server's RSA-4096 public key and is pinned at construction time — if the server rotates its key the adapter immediately detects the mismatch, and the token must be re-issued.
 
+`retrieve()` applies a `requestTimeoutMs` (default 30 s, `0` disables it) to both the metadata and data fetches, and caps the transaction-metadata/tags JSON response at `maxMetadataResponseBytes` (default 1 MiB) to guard against a hung or hostile gateway.
+
 ### `MockChainAdapter`
 
 In-memory chain adapter for development and testing. Stores on-chain references in an in-memory `Map` on Node.js or in `localStorage` in the browser (browser state survives page reloads). Enforces the same SHA-256 `ownerSecret` commitment check as the real DataRegistry contract, so ownership-gated operations (`removeReference`, `updateReference`) behave correctly in tests. `refId` values are UUID-style strings rather than the Bytes<32> format produced by the real circuit. Requires no Midnight node, proof server, indexer, or DUST tokens.
@@ -128,6 +130,8 @@ new HttpGatewayChainAdapter({
 ```
 
 For gateways that use a custom CA or mutual-TLS client certificate, pass a preconfigured `fetch`-compatible function via `customFetch`.
+
+Every operation applies a `requestTimeoutMs` (default 30 s, `0` disables it), and `readReference`/`listReferences` cap their JSON response at `maxResponseBytes` (default 10 MiB) — both guard against a hung or hostile gateway.
 
 One important security note: `ownerSecret` is an internal ZK witness that is deliberately stripped before any network call — it is never transmitted to the gateway. Ownership enforcement (whether to honour a remove or update request) is therefore the responsibility of the backend service, not the adapter.
 
@@ -197,7 +201,7 @@ Password-derived encryption. Derives a 64-byte KEK from a user-supplied password
 
 The `salt` is mandatory and must be supplied by the caller. Use an app-scoped domain label (`"myapp:v1"`), a per-user identifier, or a combination. The SDK never supplies a default to avoid silent cross-app key collisions when passwords are reused. Passwords are validated at construction: minimum 12 characters, at least 3 of 4 character classes (uppercase, lowercase, digits, special), no sequential runs, and at least 60 bits of estimated entropy.
 
-For constrained devices (e.g. mobile browsers) where 128 MB is too expensive, pass `preset: "v1-lite"` (64 MB). In tests, pass `params: { N: 1024, r: 8, p: 1 }` for fast derivation — never use these values in production.
+For constrained devices (e.g. mobile browsers) where 128 MB is too expensive, pass `preset: "v1-lite"` (64 MB). In tests, pass `params: { N: 32768, r: 8, p: 1 }` for fast derivation — that's the fastest params the SDK allows. The SDK enforces a hard floor on any custom `N` (must be ≥ 32768 and a power of two — the OWASP 2024 minimum); anything weaker throws at construction time rather than silently producing a brute-forceable KDF.
 
 ```typescript
 new PasswordEncryptionAdapter({
@@ -212,6 +216,8 @@ Post-quantum note: human-chosen passwords rarely reach 256-bit entropy. For full
 ### `MnemonicEncryptionAdapter`
 
 BIP-39 mnemonic or hex seed. Derives a KEK via HKDF from a BIP-39 seed phrase or a raw 64-byte hex seed. Requires a 24-word mnemonic — 12-word phrases are rejected at construction because they provide only 64-bit post-quantum security (below NIST's 128-bit minimum). With 24 words the adapter is unconditionally post-quantum safe. The raw seed bytes are imported into a non-extractable `CryptoKey` and zeroed from the JS heap immediately — they are never readable from JavaScript after construction. Like `PasswordEncryptionAdapter`, derivation is deterministic: the same mnemonic always recovers the same key on any device.
+
+Mnemonic validation checks the full BIP-39 checksum, not just that each word is in the wordlist — a phrase with a single-word typo that still happens to land on another real wordlist word is rejected rather than silently deriving a different, wrong key.
 
 ```typescript
 new MnemonicEncryptionAdapter({ mnemonic: "word1 word2 … word24" });

@@ -18,7 +18,7 @@ A fresh random **Data Encryption Key (DEK)** is generated per upload. The DEK is
 
 ### Why does `MnemonicEncryptionAdapter` require 24 words?
 
-A 12-word BIP-39 mnemonic provides only 128 bits of entropy, which Grover's algorithm halves to 64-bit post-quantum security — below NIST's 128-bit minimum. The adapter rejects anything shorter than 24 words at construction time.
+A 12-word BIP-39 mnemonic provides only 128 bits of entropy, which Grover's algorithm halves to 64-bit post-quantum security — below NIST's 128-bit minimum. The adapter rejects anything shorter than 24 words at construction time. It also validates the full BIP-39 checksum, not just word-count and wordlist membership, so a single mistyped word that still happens to be a real wordlist entry is rejected instead of silently deriving a different key.
 
 ### Can multiple adapters decrypt the same upload?
 
@@ -71,6 +71,8 @@ A reordered chunk, a substituted manifest, or a ciphertext moved from one role t
 ### How does the SDK verify that an Arweave gateway hasn't tampered with the retrieved data?
 
 Every Arweave transaction includes an `X-Content-Hash` tag containing the BLAKE3 hex digest of the uploaded bytes (ciphertext for private uploads, plaintext for public ones). On retrieval, `ArweaveStorageAdapter` fetches the transaction metadata, recomputes the hash, and throws `[dStorage/arweave] Content hash mismatch` if they differ.
+
+When retrieval goes through `@dstorage/core` (the normal path via `retrieveByRefId()`/`retrieveByStorageId()`), the hash it verifies against is anchored to the on-chain reference rather than the gateway's own tag — so the check holds even against a gateway that controls both the returned bytes and its `X-Content-Hash` tag and could otherwise make them consistent with each other. Using an Arweave adapter directly, without going through core, falls back to trusting the gateway-supplied tag alone.
 
 For private uploads this is defence-in-depth on top of XChaCha20-Poly1305 AEAD authentication. For public uploads it is the primary integrity guarantee.
 

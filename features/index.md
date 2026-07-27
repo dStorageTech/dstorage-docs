@@ -10,7 +10,7 @@ you route payments through dStorage Pro's managed service.
 - Three encryption adapters: `PasswordEncryptionAdapter`, `MnemonicEncryptionAdapter` (BIP-39), and `KeypairEncryptionAdapter` (ML-KEM768, post-quantum). See [FAQ: Encryption & Security](/faq/encryption-security#encryption-security).
 - Multi-key encryption — register multiple encryption adapters (e.g. a password plus a recovery mnemonic); any one can independently decrypt.
 - Key rotation (`rotateKeys()`) — add or remove encryption adapters without re-uploading content.
-- `generatePqsPassword()` — a cryptographically random, machine-generated password for full post-quantum protection at the key-encapsulation layer.
+- `generateHighEntropyPassword()` — a cryptographically random, machine-generated 256-bit password for 128-bit (NIST-minimum) post-quantum protection at the key-encapsulation layer, with password recoverability.
 - Automatic large-file chunking — files over 10 MB are transparently split into independently encrypted chunks. See [FAQ: Concepts & Features](/faq/concepts#does-dstorage-support-large-files).
 - Storage-only mode — omit `chainAdapter` to skip on-chain references entirely.
 - Explicit public-mode opt-in (`isPublic: true`) for world-readable content — never the default.

@@ -211,7 +211,7 @@ new PasswordEncryptionAdapter({
 });
 ```
 
-Post-quantum note: human-chosen passwords rarely reach 256-bit entropy. For full post-quantum safety at the key layer, use `KeypairEncryptionAdapter`.
+Post-quantum note: human-chosen passwords rarely reach 256-bit entropy. For the full ~192-bit post-quantum safety at the key layer, use a randomly generated `KeypairEncryptionAdapter` (`generateKeypair()`, secret key backed up separately). A password- or mnemonic-derived keypair (`fromPassword()` / `fromMnemonic()`) is bounded at ~128-bit by the derivation input's Grover ceiling — still the NIST minimum, but not 192-bit.
 
 ### `MnemonicEncryptionAdapter`
 

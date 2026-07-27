@@ -14,7 +14,7 @@ A fresh random **Data Encryption Key (DEK)** is generated per upload. The DEK is
 | ---------------------------- | ------------------------------------ | -------------------------------- | ------------------------------------------------------------------ |
 | `PasswordEncryptionAdapter` | scrypt(password, salt)               | Conditional on password entropy | Yes — same password + salt on any device                          |
 | `MnemonicEncryptionAdapter` | BIP-39 (24-word) or 64-byte hex seed | 128-bit PQ (unconditional)      | Yes — same mnemonic on any device                                 |
-| `KeypairEncryptionAdapter`  | ML-KEM768 public/secret keypair      | 192-bit PQ (unconditional)      | Requires SK; re-derivable via `fromPassword()` / `fromMnemonic()` |
+| `KeypairEncryptionAdapter`  | ML-KEM768 public/secret keypair      | 192-bit PQ for a random `generateKeypair()`; ~128-bit when derived via `fromPassword()` / `fromMnemonic()` (bounded by the derivation input's Grover ceiling) | Requires SK; re-derivable via `fromPassword()` / `fromMnemonic()` |
 
 ### Why does `MnemonicEncryptionAdapter` require 24 words?
 
@@ -37,11 +37,11 @@ Data is permanently unrecoverable. The SDK stores no key material — keys are d
 
 ### Is `PasswordEncryptionAdapter` post-quantum safe?
 
-At the data layer, yes — XChaCha20-Poly1305 with a 256-bit key gives 128-bit post-quantum security (NIST minimum). At the key encapsulation layer, it depends on password entropy. Human-chosen passwords cannot reach the 256-bit entropy required to resist Grover's. To close this gap, use `generatePqsPassword()` with `KeypairEncryptionAdapter.fromPassword()`, or switch to `MnemonicEncryptionAdapter` (24 words).
+At the data layer, yes — XChaCha20-Poly1305 with a 256-bit key gives 128-bit post-quantum security (NIST minimum). At the key encapsulation layer, it depends on password entropy. Human-chosen passwords cannot reach the 256-bit entropy required to resist Grover's. To reach the 128-bit (NIST-minimum) PQ level, use `generateHighEntropyPassword()` with `KeypairEncryptionAdapter.fromPassword()`, or switch to `MnemonicEncryptionAdapter` (24 words).
 
-### What is `generatePqsPassword()`?
+### What is `generateHighEntropyPassword()`?
 
-A helper that produces a cryptographically random 43-character base64url string (32 bytes = 256 bits of real entropy). Pass the result to `KeypairEncryptionAdapter.fromPassword()` to get full ML-KEM PQ protection without manual key storage. Store the generated string — it is the only secret needed to re-derive the keypair.
+A helper that produces a cryptographically random 43-character base64url string (32 bytes = 256 bits of real entropy). Pass the result to `KeypairEncryptionAdapter.fromPassword()` to get **128-bit** (NIST-minimum) PQ protection at the key layer with no secret key to store. Note the derived keypair is bounded at ~128-bit by the password's Grover ceiling, not ML-KEM-768's ~192-bit — for the full 192-bit use a random `generateKeypair()` and back up its secret key separately. Store the generated string — it is the only secret needed to re-derive the keypair.
 
 ### What makes a password acceptable to `PasswordEncryptionAdapter`?
 
@@ -53,7 +53,7 @@ The adapter enforces four rules at construction time:
 4. **No keyboard-walk patterns** — sequences like `qwerty` or `asdfg` are rejected.
 5. **Entropy** — charset-based entropy estimate must reach 60 bits (configurable via `minEntropyBits`).
 
-If your use case requires bypassing these checks — for example, a machine-generated credential — use `generatePqsPassword()` to obtain a cryptographically random 43-character base64url string (256 bits of real entropy), then pass it to `KeypairEncryptionAdapter.fromPassword()` for full ML-KEM PQ protection.
+If your use case requires bypassing these checks — for example, a machine-generated credential — use `generateHighEntropyPassword()` to obtain a cryptographically random 43-character base64url string (256 bits of real entropy), then pass it to `KeypairEncryptionAdapter.fromPassword()` for 128-bit (NIST-minimum) PQ protection at the key layer.
 
 ### How does the SDK prevent swapping chunks or blobs in transit?
 

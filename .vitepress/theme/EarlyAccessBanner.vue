@@ -44,7 +44,9 @@ onUnmounted(() => {
   justify-content: center;
   gap: 0.5rem 0.6rem;
   padding: 0.55rem 1.5rem;
-  background: var(--vp-c-brand-soft);
+  background: var(--dstorage-banner-bg);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
   border-bottom: 1px solid var(--vp-c-divider);
   font-size: 0.82rem;
   line-height: 1.4;

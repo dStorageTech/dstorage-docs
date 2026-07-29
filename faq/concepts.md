@@ -2,7 +2,7 @@
 
 ### What is dStorage?
 
-dStorage is a privacy-first SDK that combines client-side encryption, decentralised storage (Arweave), and on-chain coordination (Midnight) in a single developer-facing API. It lets dApps store sensitive user data without the operator ever seeing the plaintext.
+dStorage is a privacy-first SDK that combines client-side encryption, decentralised storage (currently Arweave), and on-chain coordination (Midnight) in a single developer-facing API. It lets dApps store sensitive user data without the operator ever seeing the plaintext.
 
 ### Who is dStorage designed for?
 
@@ -16,10 +16,14 @@ Most services store user data on servers they control. Users must trust the oper
 
 An on-chain reference is a tamper-proof record written to the Midnight blockchain that links an owner's identity to an encrypted storage blob. It is what makes data _retrievable_ — you can look it up later with just a `refId`. The reference contains an encrypted storage pointer and a key envelope; without the owner's key neither piece reveals anything meaningful.
 
+### What is the `DataRegistry` contract?
+
+`DataRegistry` is dStorage's own Midnight smart contract — you don't write or deploy custom contract logic yourself. The SDK deploys a fresh instance (or joins an existing one if you pass `contractAddress`) the first time you call `init()`. It acts as the on-chain registry of references: every `store()` call adds one entry, and each entry holds an encrypted storage pointer (`storageId`), an encrypted key envelope (`keyEnvelope`), the encryption scheme label, a `writtenAt` timestamp, and optional metadata (encrypted the same way as the payload) — plus an ownership commitment that authorizes later `update()`/`removeReference()` calls. It never holds raw data or plaintext keys, only encrypted pointers and cryptographic commitments.
+
 ### What does the SDK store on-chain vs off-chain?
 
-- **Off-chain (Arweave)**: the encrypted data payload.
-- **On-chain (Midnight DataRegistry contract)**: an encrypted storage pointer (`storageId`), an encrypted key envelope (`keyEnvelope`), the encryption scheme label, and optional public metadata. Raw user data and plaintext keys never appear on-chain.
+- **Off-chain (the storage network — currently Arweave)**: the encrypted data payload.
+- **On-chain (Midnight DataRegistry contract)**: an encrypted storage pointer (`storageId`), an encrypted key envelope (`keyEnvelope`), the encryption scheme label, and optional metadata (encrypted the same way as the payload; unavailable for public uploads). Raw user data and plaintext keys never appear on-chain.
 
 ### What happens, step by step, when I call `store()`?
 
@@ -27,7 +31,7 @@ Your data is encrypted on-device, then (if a payment adapter is configured) the 
 
 ### Can dStorage operators read my data?
 
-No. Encryption happens on the user's device using keys derived locally. The managed payment service (`dstorage.pro`) only receives a cryptographic hash — never content. The storage network (Arweave) holds ciphertext. No party in the pipeline holds an unencrypted copy.
+No. Encryption happens on the user's device using keys derived locally. The managed payment service (`dstorage.pro`) only receives a cryptographic hash — never content. The storage network (currently Arweave) holds ciphertext. No party in the pipeline holds an unencrypted copy.
 
 ### What is a `refId`?
 
@@ -47,6 +51,8 @@ Yes. Files larger than 10 MB are automatically split into independently encrypte
 
 ### What networks and storage providers are supported today?
 
+"Storage network" refers to the off-chain layer where encrypted blobs live. dStorage's storage adapter is pluggable, but Arweave (via the adapter family below) is the only storage network supported today — support for additional storage networks is planned for future releases.
+
 | Area    | Available now                                                  | Stub / planned |
 | ------- | ---------------------------------------------------------------| -------------- |
 | Storage | Mock, Arweave Local, Arweave, Arweave Bundler (managed)        |
@@ -63,4 +69,4 @@ Yes. Files larger than 10 MB are automatically split into independently encrypte
 
 ### What does `isPublic: true` do?
 
-It is an explicit opt-in that skips both encryption layers. The data payload is stored as raw bytes; the `storageId` is written to the chain in plaintext. Use it only for world-readable content. **Public mode is permanent and irreversible** — once data is stored unencrypted on Arweave it cannot be made private retroactively.
+It is an explicit opt-in that skips both encryption layers. The data payload is stored as raw bytes; the `storageId` is written to the chain in plaintext. Use it only for world-readable content. **Public mode is permanent and irreversible** — once data is stored unencrypted on the storage network (currently Arweave) it cannot be made private retroactively.

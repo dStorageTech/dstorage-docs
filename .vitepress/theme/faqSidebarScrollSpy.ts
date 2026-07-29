@@ -117,13 +117,14 @@ export function useFaqSidebarScrollSpy(): void {
 
     alignActiveSidebarItem(sidebar);
 
-    // In dev mode (`vitepress dev`), a FAQ section group can briefly render
-    // with its `collapsed` class still applied before the config's
-    // `collapsed: false` (see .vitepress/faqSidebar.ts) takes effect,
-    // removing that class a moment later — which un-hides `.items` (see
-    // `.VPSidebarItem.collapsed .items { display: none }` in VitePress's
-    // VPSidebarItem.vue) and silently un-scrolls the target again. That's a
-    // class (attribute) change, not a childList change, so watch for both;
+    // Every FAQ section group renders `collapsed: true` (see
+    // .vitepress/faqSidebar.ts), except the one containing the active page,
+    // which VitePress's own sidebar control (`useSidebarControl`'s
+    // `hasActiveLink`/`isActiveLink` watcher) force-expands a moment after
+    // initial render — removing the `collapsed` class and un-hiding `.items`
+    // (see `.VPSidebarItem.collapsed .items { display: none }` in VitePress's
+    // VPSidebarItem.vue), which silently un-scrolls the target again. That's
+    // a class (attribute) change, not a childList change, so watch for both;
     // re-align against freshly-queried elements for a short grace period
     // after navigation, then stop watching.
     const observer = new MutationObserver(() => alignActiveSidebarItem(sidebar));

@@ -21,6 +21,7 @@
   --vp-c-brand-2: #00b89f;
   --vp-c-brand-3: #00cbb0;
   --vp-c-brand-soft: rgba(0, 158, 136, 0.14);
+  --dstorage-banner-bg: rgba(0, 158, 136, 0.55);
 
   --docs-radius: 12px;
   --docs-radius-lg: 18px;
@@ -42,6 +43,7 @@
   --vp-c-brand-2: #1fffd8;
   --vp-c-brand-3: #00e5c8;
   --vp-c-brand-soft: rgba(0, 229, 200, 0.12);
+  --dstorage-banner-bg: rgba(0, 229, 200, 0.45);
 }
 
 /* Buttons */

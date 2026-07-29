@@ -91,7 +91,7 @@ For extra resilience, use the proactive path: `onProgress` fires a `"stored"` ph
 await sdk.store(bytes, {
   onProgress(p) {
     if (p.phase === "stored" && p.recovery) {
-      // Safe to persist — keyEnvelope is the DEK encrypted under your KEK
+      // Safe to persist — keyEnvelope is the encryption key already wrapped by your configured adapter
       localStorage.setItem("pending-store", JSON.stringify(p.recovery));
     }
   },
@@ -116,7 +116,7 @@ if (pending) {
 }
 ```
 
-`keyEnvelope` is the DEK already encrypted under your KEK — it is safe to persist to localStorage or a database. The raw DEK is never exposed. For public uploads, `keyEnvelope` is `undefined` and the content remains publicly accessible via `retrieveByStorageId(recovery.storageId)`. `contentHash` is the BLAKE3 hex digest of the stored ciphertext — pass it to `registerReference()` so the recovered reference carries the same on-chain integrity commitment.
+`keyEnvelope` is the per-upload encryption key already wrapped by your configured encryption adapter — it is safe to persist to localStorage or a database. The raw encryption key is never exposed. For public uploads, `keyEnvelope` is `undefined` and the content remains publicly accessible via `retrieveByStorageId(recovery.storageId)`. `contentHash` is the BLAKE3 hex digest of the stored ciphertext — pass it to `registerReference()` so the recovered reference carries the same on-chain integrity commitment.
 
 ### How do I preserve a deployed contract address across runs?
 
@@ -144,24 +144,7 @@ await sdk.store(bytes, {
 });
 ```
 
-Metadata is stored alongside the on-chain reference and returned during retrieval.
-
-### How do I run tests?
-
-```sh
-npm test          # unit tests — fully in-memory, no network required
-npm run test:integration  # integration tests — requires arlocal (+ proof server for Midnight suite)
-```
-
-Unit tests use `MockStorageAdapter`, `MockChainAdapter`, and fast scrypt params so the suite completes in seconds. Integration tests are skipped gracefully when the required services are not running.
-
-### How do I run only a single integration suite?
-
-```sh
-npm run test:integration -- -t "arlocal only"
-npm run test:integration -- -t "multi-key wrapping"
-npm run test:integration -- -t "full stack"
-```
+Metadata is encrypted with the same per-upload key as the payload before being written on-chain, and decrypted automatically on retrieval — it is never stored in plaintext. Because there's no encryption key in public mode, passing `metadata` together with `isPublic: true` throws rather than silently storing it unencrypted.
 
 ### What scrypt params should I use in tests?
 
@@ -173,21 +156,19 @@ new PasswordEncryptionAdapter({
 });
 ```
 
-### What is the build order for packages?
-
-```
-crypto → encryption → payment → storage → chain → core
-```
-
-Run `npm run build` from the repo root — it respects this order. After modifying any package source, rebuild before running the demo apps.
-
 ### Can I integrate dStorage into an existing Midnight app?
 
-Yes. See `QUICK_START.md` for a step-by-step guide that wires dStorage into the [Midnight Bulletin Board](https://github.com/midnightntwrk/example-bboard) example app, reusing its existing wallet and proof server.
+Yes. dStorage is designed to sit alongside an existing Midnight app rather than replace anything — the `DataRegistry` contract it uses is independent of your own contract(s), so integrating it is mostly additive. A few ideas for approaching it:
+
+- Reuse the app's existing wallet connection and proof server when configuring `MidnightChainAdapter` (`walletProvider` in Node.js, `connectorName` in the browser) instead of standing up a second wallet flow.
+- Deploy `DataRegistry` once and save the resulting `contractAddress` alongside your app's other deployed contract addresses, so later runs join it rather than redeploying.
+- Prototype the calling code first with `MockStorageAdapter`/`MockChainAdapter`, then swap in real adapters once `store()`/`retrieveByRefId()` are wired in at the points where your app handles sensitive user data.
+
+The [Midnight Bulletin Board](https://github.com/midnightntwrk/example-bboard) is a small example dApp — a single Compact contract with `post`/`takeDown` circuits for posting and removing one message at a time, with its own wallet and proof server setup — that's a good, low-friction target for practicing exactly this kind of integration: adding dStorage's independent `DataRegistry` contract alongside an app's existing one.
 
 ### How do I update the content stored at an existing reference?
 
-Use `sdk.update(refId, newBytes, options?)`. It encrypts the new content with a fresh DEK, uploads it to the storage network, then calls `chainAdapter.updateReference()` — proving ownership with the old `ownerSecret` and registering the new one atomically.
+Use `sdk.update(refId, newBytes, options?)`. It encrypts the new content with a fresh per-upload encryption key, uploads it to the storage network, then calls `chainAdapter.updateReference()` — proving ownership with the old `ownerSecret` and registering the new one atomically.
 
 - The on-chain pointer is updated in place; the `refId` stays the same.
 - Old content is **not** deleted from the storage network — only the on-chain pointer changes.
@@ -200,7 +181,7 @@ const { chainRefId, storageId } = await sdk.update(refId, newBytes);
 
 ### How do I rotate encryption adapters without re-uploading content?
 
-Use `sdk.rotateKeys(refId)`. It re-wraps the existing DEK under all adapters currently in the instance's `encryptionAdapters` list, then writes the new `keyEnvelope` back on-chain. The storage-network ciphertext is **never touched** and `writtenAt` is preserved to reflect the original upload time.
+Use `sdk.rotateKeys(refId)`. It re-wraps the existing per-upload encryption key using all adapters currently in the instance's `encryptionAdapters` list, then writes the new `keyEnvelope` back on-chain. The storage-network ciphertext is **never touched** and `writtenAt` is preserved to reflect the original upload time.
 
 Common use cases:
 
@@ -254,4 +235,6 @@ Node.js 22 or later.
 
 ### Does the SDK work in the browser?
 
-Yes, with some constraints. Use the browser entry point (`@dstorage/chain/browser`) which excludes Node.js-only adapters. Set `walletMode: "connector"` in `MidnightChainAdapter` to use a browser wallet extension (1AM by default, or Lace, or any other wallet implementing the dApp Connector API). Pass `zkConfigBaseUrl: window.location.origin` so ZK artifacts are fetched over HTTP from the `public/` directory rather than read from disk.
+Yes. A plain `import ... from "@dstorage-tech/dstorage-sdk"` already resolves to a browser-safe build automatically in bundlers that honor the package's `"browser"` exports condition (Vite, webpack 5+, Rollup, esbuild) — no separate import needed. If your tooling doesn't resolve conditional exports, or you just want it explicit, the same build is also available at `@dstorage-tech/dstorage-sdk/browser`.
+
+The main constraint is `MidnightChainAdapter`'s `walletMode: "provider"` (facade mode), which only works in Node.js — use `walletMode: "connector"` instead to delegate to a browser wallet extension (leave `connectorName` unset to use whichever wallet is first detected, or set it to prefer a specific one; any wallet implementing the dApp Connector API works). Pass `zkConfigBaseUrl: window.location.origin` so ZK artifacts are fetched over HTTP from the `public/` directory rather than read from disk.

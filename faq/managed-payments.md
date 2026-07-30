@@ -66,9 +66,9 @@ Or add them to a `.env` file in your project root (loaded via `dotenv` or equiva
 
 DUST chain fees are sponsored by the managed service too — not just Arweave storage. When `MidnightChainAdapter` is configured with `signingServerUrl` and `authToken`, the SDK wraps the wallet's transaction-balancing step so the signing server balances *and* signs the transaction on the wallet's behalf. The local wallet only needs to expose its public keys (for the ZK circuit) — it never needs to hold DUST. This is automatic: no configuration beyond `signingServerUrl`/`authToken` on `MidnightChainAdapter` is needed.
 
-### Does the managed service support the bboard quick-start example?
+### Does the managed service work with the bboard example dApp?
 
-Yes — the QUICK_START guide is built around the managed flow. `ArweaveBundlerStorageAdapter` + `MidnightChainAdapter` in provider-wallet mode both accept `signingServerUrl` / `authToken` and reuse bboard's existing wallet and proof server. No separate AR wallet is needed.
+Yes. `ArweaveBundlerStorageAdapter` + `MidnightChainAdapter` in provider-wallet mode both accept `signingServerUrl` / `authToken` and reuse bboard's existing wallet and proof server. No separate AR wallet is needed.
 
 ### Is there a known security limitation with the managed payment response?
 

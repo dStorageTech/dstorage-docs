@@ -4,9 +4,10 @@
 
 - Node.js 22+, npm
 - Docker (for Midnight proof server and Arweave Local)
-- Midnight Compact compiler v0.31.1 (for recompiling the contract)
 - 1AM wallet extension (latest version) — or Lace, or another dApp Connector-compatible wallet (browser connector flows only)
 - Wander wallet extension (Arweave browser flows only)
+
+The `DataRegistry` contract ships pre-compiled with the SDK package (compiled circuits and keys included) — the Midnight Compact compiler is only needed if you're modifying the contract itself, not for normal SDK usage.
 
 ### How do I start the local Midnight proof server?
 
@@ -25,14 +26,15 @@ No real AR tokens are needed — arlocal auto-funds test wallets.
 
 ### What Midnight networks does the adapter support?
 
-The `MidnightChainAdapter` supports `undeployed` (localhost) and `preprod`.
+Out of the box, with built-in default endpoints, `undeployed` (localhost) and `preprod`. Any other network works too — pass its name as `network` and explicitly supply `nodeEndpoint`, `nodeWsEndpoint`, `indexerEndpoint`, `indexerWsEndpoint`, and `proofServerEndpoint`; the adapter only rejects a network name if defaults are missing and any of those endpoints are left unset.
 
 ### How do I configure `MidnightChainAdapter` for browser vs Node.js?
 
 Use the `walletMode` discriminated union:
 
+Node.js (provider mode) — caller supplies a pre-built, synced WalletFacade:
+
 ```typescript
-// Node.js (provider mode) — caller supplies a pre-built, synced WalletFacade
 {
   walletMode: "provider",
   walletProvider,       // AdapterWalletProvider built and synced by the app
@@ -40,12 +42,19 @@ Use the `walletMode` discriminated union:
   zkArtifactsPath,      // optional: absolute path to keys/ and zkir/ dirs — the SDK
                          // ships its own compiled copy (see below), no separate compile needed
 }
-
-// Browser (connector mode) — delegates to a wallet extension (1AM, Lace, or another dApp Connector wallet)
-{ walletMode: "connector", connectorName: "1am", zkConfigBaseUrl: window.location.origin }
 ```
 
-`walletMode` is required. See `QUICK_START.md` for a complete provider-mode setup example.
+Browser (connector mode) — delegates to a wallet extension (1AM, Lace, or another dApp Connector wallet):
+
+```typescript
+{
+  walletMode: "connector",
+  connectorName: "1am",              // wallet to prefer under window.midnight
+  zkConfigBaseUrl: window.location.origin, // base URL serving keys/ and zkir/
+}
+```
+
+`walletMode` is required.
 
 ### How do I configure `ArweaveBundlerStorageAdapter` for managed uploads?
 
@@ -88,19 +97,5 @@ compiled ZK artifacts (prover/verifier keys and ZKIR) ship inside the
     "dist/contracts/dataregistry/managed",
   );
   ```
-- **Browser**: copy `keys/` and `zkir/` from `node_modules/@dstorage-tech/dstorage-sdk/dist/contracts/dataregistry/managed/` into your application's public assets directory, then pass `zkConfigBaseUrl: window.location.origin`. Artifacts are fetched over HTTP. (The `starter-template`'s `npm run dev` does this automatically — see `scripts/copy-zk-artifacts.mjs`.)
+- **Browser**: copy `keys/` and `zkir/` from `node_modules/@dstorage-tech/dstorage-sdk/dist/contracts/dataregistry/managed/` into your application's public assets directory, then pass `zkConfigBaseUrl: window.location.origin`. Artifacts are fetched over HTTP. (The [`starter-template`](https://github.com/dStorageTech/dstorage-docs/tree/main/starter-template)'s `npm run dev` does this automatically — see `scripts/copy-zk-artifacts.mjs`.)
 
-### What environment variables does the integration test suite need?
-
-Copy `tests/integration/env.example` to `.env.integration` and fill in:
-
-| Variable                       | Required               | Default                 | Purpose                                                                              |
-| ------------------------------- | ----------------------- | ------------------------- | -------------------------------------------------------------------------------------|
-| `INTEGRATION_SEED`             | Yes (full-stack suite) | —                        | 24-word BIP-39 mnemonic or 128-char (64-byte) hex seed for a funded Midnight wallet |
-| `INTEGRATION_CONTRACT_ADDRESS` | No                     | deploys fresh            | Reuse an existing DataRegistry to skip slow deployment                              |
-| `ARLOCAL_URL`                  | No                     | `http://localhost:1984` | Arweave Local endpoint                                                               |
-| `PROOF_SERVER_URL`             | No                     | `http://localhost:6300` | Midnight proof server endpoint                                                       |
-
-### Can I skip integration services in CI?
-
-Yes. If arlocal or the proof server is not running, those suites are skipped rather than failed. The unit test suite (`npm test`) never requires external services.

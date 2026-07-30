@@ -57,13 +57,13 @@ If your use case requires bypassing these checks — for example, a machine-gene
 
 ### How does the SDK prevent swapping chunks or blobs in transit?
 
-Each ciphertext is bound to its role via Additional Authenticated Data (AAD). Labels used:
+Each ciphertext is bound to its role via Additional Authenticated Data (AAD). A single-shot (non-chunked) upload uses the payload label; once a file is large enough to trigger chunking (see [Does dStorage support large files?](./concepts#does-dstorage-support-large-files)), the manifest and chunk labels come into play instead. The storage pointer label applies to every upload either way. Labels used:
 
 | Label                       | Protects                                |
 | ---------------------------- | ---------------------------------------- |
 | `dstorage:payload:v1`       | Single-shot (non-chunked) uploads       |
-| `dstorage:manifest:v1`      | Chunked upload manifest                 |
-| `dstorage:chunk:v1:<i>/<n>` | Each chunk bound to its index and total |
+| `dstorage:manifest:v1`      | Chunked upload manifest (large files only) |
+| `dstorage:chunk:v1:<i>/<n>` | Each chunk bound to its index and total (large files only) |
 | `dstorage:storageId:v1`     | Storage pointer encrypted on-chain      |
 
 A reordered chunk, a substituted manifest, or a ciphertext moved from one role to another causes MAC verification to fail before any data is returned.
@@ -80,7 +80,7 @@ To opt out when using a fully trusted private gateway, pass `skipIntegrityCheck:
 
 ### Is the storage pointer on-chain encrypted?
 
-Yes. The `storageId` (the Arweave content address) is encrypted with the same per-upload DEK using a fresh nonce, then stored in the `DataRegistry` contract. A blockchain observer cannot learn which storage resource belongs to which wallet even though the on-chain record is public.
+Yes. The `storageId` (the storage network's content address — currently an Arweave transaction ID) is encrypted with the same per-upload DEK using a fresh nonce, then stored in the `DataRegistry` contract. A blockchain observer cannot learn which storage resource belongs to which wallet even though the on-chain record is public.
 
 ### What is the on-chain content hash and what does it protect against?
 
@@ -115,9 +115,11 @@ Both checks run on `retrieveByRefId()` with Arweave adapters, providing two inde
 
 ### What is `ownerSecret` and why is it not stored?
 
-`ownerSecret` is an HKDF derivative of the DEK and the raw `storageId`. It is needed to remove or update a reference on-chain. Because it is derived deterministically from values the SDK already holds, it never needs to be persisted — it is recomputed on demand during `removeReference()`.
+`ownerSecret` is an HKDF derivative of the DEK and the raw `storageId`. It is needed to remove or update a reference on-chain. Because it is derived deterministically from values the SDK already holds, it never needs to be persisted — it is recomputed on demand during `removeReference()` and `update()`. `update()` re-derives the *old* `ownerSecret` to prove ownership of the existing reference, and derives a *new* one (from the fresh per-upload DEK) to register alongside the updated content — both in the same atomic call.
 
-### What exactly changes when I call `rotateKeys()` — and what stays the same?
+### What exactly changes when I call `rotateKeys()`, and what stays the same?
+
+`rotateKeys(refId)` re-wraps an existing reference's per-upload DEK under the encryption adapters currently configured on the SDK instance, then writes the new `keyEnvelope` back on-chain — without re-uploading or re-encrypting the content itself. It's the mechanism behind adding/removing a recovery key and changing a password (see [How do I rotate encryption adapters without re-uploading content?](./developers#how-do-i-rotate-encryption-adapters-without-re-uploading-content) in the Developers section).
 
 | Field                                | Changes?                                                  |
 | -------------------------------------- | ----------------------------------------------------------|
@@ -133,6 +135,8 @@ Because the DEK itself is unchanged, any party who previously obtained the DEK r
 ### If I call `update()`, what happens to the original content on the storage network?
 
 Nothing — it stays there. `update()` only changes the on-chain pointer (the `storageId` field in the DataRegistry reference) to point at the newly encrypted blob. The old blob remains at its original `storageId` on the storage network; whether it can be garbage-collected depends on the storage provider (Arweave uploads, for example, are permanent and immutable).
+
+Today the SDK doesn't track old `storageId`s once `update()` overwrites the on-chain pointer, so recovering a prior version means having saved its `storageId` yourself beforehand. Native content versioning — the SDK keeping a history of prior `storageId`s per reference and exposing an API to list or retrieve them — is a possible future addition, not something the SDK supports today.
 
 - Anyone who saved the old `storageId` can still download the old ciphertext — but without the old `keyEnvelope` they cannot decrypt it, as the key envelope on-chain now covers the new content's DEK.
 - `update()` is best suited for mutable application state (user profiles, document drafts) where preserving old versions is not required.

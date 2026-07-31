@@ -24,6 +24,26 @@ const sdk = new DStorage({
 });
 ```
 
+### `ArweaveLocalStorageAdapter`
+
+Local Arweave integration testing. A drop-in replacement for `ArweaveStorageAdapter` that connects to a local arlocal node (`localhost:1984`) instead of the Arweave mainnet. No real AR tokens are needed. The recommended setup is the `createWithTestWallet()` factory, which generates a fresh JWK wallet and auto-funds it:
+
+```typescript
+const { adapter } = await ArweaveLocalStorageAdapter.createWithTestWallet({
+  fundAr: 5,
+});
+const sdk = new DStorage({ storageAdapter: adapter /* … */ });
+```
+
+The adapter exposes a `.testnet` helper with utilities for controlling the local node: `mine(blocks)` to fast-forward the blockchain, `mintTokens(address, winstons)` to fund wallets, `getBalance(address)`, `isRunning()`, and `reset()` for a clean slate between test runs.
+
+arlocal must be running before using `ArweaveLocalStorageAdapter`:
+
+```sh
+docker run -d --rm -p 1984:1984 textury/arlocal
+# or: npx arlocal
+```
+
 ### `ArweaveStorageAdapter`
 
 Permanent Arweave storage. Uploads to the Arweave permaweb: pay once, store forever. Signing is handled by the ArConnect browser extension (browser) or a JWK wallet file (Node.js). The adapter tags every upload with a BLAKE3 `X-Content-Hash` and verifies it on retrieval — pass `skipIntegrityCheck: true` only when using a fully trusted private gateway. Uploads are optimistic (HTTP 202); if you need to block until the transaction is confirmed on-chain, set `waitForConfirmation: true` (expect 2–20 minutes). For development against the Arweave testnet, use `gateway: { host: "arweave.dev", port: 443, protocol: "https" }`.
@@ -44,31 +64,13 @@ const sdk = new DStorage({
 });
 ```
 
-Requires a funded AR wallet. Not suitable for applications where end-users do not hold AR — use `ArweaveBundlerStorageAdapter` instead.
+Requires a funded AR wallet by default (local signing via `walletKey`). To avoid requiring end-users to hold AR, pass `signingServerUrl`/`authToken` instead to delegate signing to a managed service (see [What is dStorage Pro?](./managed-payments#what-is-dstorage-pro) in the Managed Payments section) — the same mechanism `ArweaveBundlerStorageAdapter` requires unconditionally (it has no local-signing mode; omitting `signingServerUrl` throws). The Bundler adapter's advantage isn't avoiding a wallet — both need a managed signing service to do that — it's near-instant ANS-104 finality instead of the 2–20 minute L1 confirmation wait.
 
-### `ArweaveLocalStorageAdapter`
-
-Local Arweave integration testing. A drop-in replacement for `ArweaveStorageAdapter` that connects to a local arlocal node (`localhost:1984`) instead of the Arweave mainnet. No real AR tokens are needed. The recommended setup is the `createWithTestWallet()` factory, which generates a fresh JWK wallet and auto-funds it:
-
-```typescript
-const { adapter } = await ArweaveLocalStorageAdapter.createWithTestWallet({
-  fundAr: 5,
-});
-const sdk = new DStorage({ storageAdapter: adapter /* … */ });
-```
-
-The adapter exposes a `.testnet` helper with utilities for controlling the local node: `mine(blocks)` to fast-forward the blockchain, `mintTokens(address, winstons)` to fund wallets, `getBalance(address)`, `isRunning()`, and `reset()` for a clean slate between test runs.
-
-Start arlocal before running tests:
-
-```sh
-docker run -d --rm -p 1984:1984 textury/arlocal
-# or: npx arlocal
-```
+`retrieve()` — the method that downloads previously stored content back from Arweave — is bounded by the `maxRetrieveSizeBytes` constructor option (default 256 MiB): the adapter rejects the download upfront if the transaction metadata reports a larger `data_size`, and rejects again after loading if the actual byte count exceeds the limit anyway. This guards against a gateway serving a misleadingly small `data_size` or an unexpectedly huge blob.
 
 ### `ArweaveBundlerStorageAdapter`
 
-Fast finality via managed signing. Uploads via the ANS-104 Arweave bundler, which delivers near-instant finality compared to the 2–20 minute wait for Arweave L1 transactions. The signing server holds a funded bundler account, so end-users need no AR wallet. Privacy is preserved: only a 48-byte ANS-104 `deep_hash` is sent to the server — the file bytes never leave the client.
+Fast finality via managed signing. Uploads via the ANS-104 Arweave bundler, which delivers near-instant finality compared to the 2–20 minute wait for Arweave L1 transactions. The signing server holds a funded bundler account, so end-users need no AR wallet — see [What is dStorage Pro?](./managed-payments#what-is-dstorage-pro) in the Managed Payments section for the managed service this adapter relies on. Privacy is preserved: only a 48-byte ANS-104 `deep_hash` is sent to the server — the file bytes never leave the client.
 
 ```typescript
 const sdk = new DStorage({
@@ -83,7 +85,7 @@ const sdk = new DStorage({
 
 The `authToken` uses the compound `ds_<credential>.<base64url_modulus>` format. The modulus is the server's RSA-4096 public key and is pinned at construction time — if the server rotates its key the adapter immediately detects the mismatch, and the token must be re-issued.
 
-`retrieve()` applies a `requestTimeoutMs` (default 30 s, `0` disables it) to both the metadata and data fetches, and caps the transaction-metadata/tags JSON response at `maxMetadataResponseBytes` (default 1 MiB) to guard against a hung or hostile gateway.
+`retrieve()` — the method that downloads previously stored content back from Arweave — makes two network calls to the gateway: one for the transaction metadata/tags (used to look up and verify the content), and one for the actual data bytes. Two constructor options bound both against a slow or misbehaving gateway: `requestTimeoutMs` (default 30 s, `0` disables it) aborts either call if it takes too long; `maxMetadataResponseBytes` (default 1 MiB) caps how large the metadata/tags JSON response is allowed to be, since a hostile gateway could otherwise return an oversized body to exhaust memory even though real metadata/tags are always tiny.
 
 ### `MockChainAdapter`
 
@@ -129,15 +131,27 @@ new HttpGatewayChainAdapter({
 });
 ```
 
-For gateways that use a custom CA or mutual-TLS client certificate, pass a preconfigured `fetch`-compatible function via `customFetch`.
+For gateways that use a custom CA or mutual-TLS client certificate, pass a preconfigured `fetch`-compatible function via `customFetch`:
+
+```typescript
+new HttpGatewayChainAdapter({
+  // …
+  customFetch: (url, init) => fetch(url, { ...init, agent: myCustomHttpsAgent }),
+});
+```
 
 Every operation applies a `requestTimeoutMs` (default 30 s, `0` disables it), and `readReference`/`listReferences` cap their JSON response at `maxResponseBytes` (default 10 MiB) — both guard against a hung or hostile gateway.
 
 One important security note: `ownerSecret` is an internal ZK witness that is deliberately stripped before any network call — it is never transmitted to the gateway. Ownership enforcement (whether to honour a remove or update request) is therefore the responsibility of the backend service, not the adapter.
 
-`refId` values are UUID-style strings (not circuit-derived Bytes<32>), matching `MockChainAdapter`'s format. No Midnight infrastructure (proof server, indexer, DUST wallet) is needed — cost estimates always return zero.
+By default, `refId` values are client-generated UUID-style strings (via `crypto.randomUUID()`), matching `MockChainAdapter`'s format — the adapter picks the ID before writing, and the backend just stores it under that key. This isn't enforced on read/list, though: the backend is free to store and return `refId` in any string format (including circuit-derived `Bytes<32>` hex), and a caller can also supply their own `refId` on write to override the client-generated default. No Midnight infrastructure (proof server, indexer, DUST wallet) is needed — cost estimates always return zero.
 
-Typical use cases: staging environments backed by a custom database, non-Midnight deployments where a simple REST service is preferable to a blockchain, and integration testing against a real HTTP service.
+Typical use cases:
+
+- Staging environments backed by a custom database
+- Non-Midnight deployments where a simple REST service is preferable to a blockchain
+- Integration testing against a real HTTP service
+- Bridging to another blockchain's own reference registry, by implementing the REST backend as a thin proxy in front of that chain
 
 ### `MidnightSimulatorChainAdapter`
 
@@ -155,12 +169,12 @@ const sdk = new DStorage({
 
 ### `MidnightChainAdapter`
 
-Real Midnight network. Connects to the Midnight blockchain (`preprod` or `undeployed`/localhost). Choose a `walletMode` based on your runtime:
+Real Midnight network. Connects to the Midnight blockchain — `preprod` and `undeployed`/localhost have built-in default endpoints; any other network (e.g. `mainnet`) also works as long as you supply `nodeEndpoint`, `nodeWsEndpoint`, `indexerEndpoint`, `indexerWsEndpoint`, and `proofServerEndpoint` explicitly. Choose a `walletMode` based on your runtime:
 
 - **`"provider"` (Node.js)**: you build and sync a `WalletFacade` yourself, then pass it as `walletProvider`. Also requires `privateStatePassword` (LevelDB encryption) and optionally `zkArtifactsPath` (absolute path to the `keys/` and `zkir/` directories).
-- **`"connector"` (browser)**: delegates all key management to a Midnight wallet extension — 1AM by default (`connectorName: "1am"`), though Lace or any other wallet implementing the dApp Connector API also works. Requires `zkConfigBaseUrl` set to the base URL from which the ZK artifacts are served.
+- **`"connector"` (browser)**: delegates all key management to a Midnight wallet extension — by default the first wallet discovered under `window.midnight`, or pass `connectorName` (e.g. `"1am"`) to prefer a specific one (matched by rdns, then declared name, then the injected key). Lace, 1AM, or any other wallet implementing the dApp Connector API works. Requires `zkConfigBaseUrl` set to the base URL from which the ZK artifacts are served.
 
-`init()` either deploys a fresh DataRegistry contract or, if you pass `contractAddress`, reconnects to an existing one. Save the returned address across runs to avoid redeploying. DUST chain fees are handled internally by the connected wallet — no explicit payment config is needed. Optionally pass `signingServerUrl` and `authToken` to route Midnight transaction balancing through dStorage Pro instead of the local wallet.
+`init()` either deploys a fresh DataRegistry contract or, if you pass `contractAddress`, reconnects to an existing one. Save the returned address across runs to avoid redeploying.
 
 ```typescript
 import { createRequire } from "node:module";
@@ -179,7 +193,7 @@ new MidnightChainAdapter({
   walletProvider, // pre-built, synced AdapterWalletProvider
   privateStatePassword,
   zkArtifactsPath,
-  network: NetworkId.Undeployed,
+  network: "undeployed",
   proofServerEndpoint: "http://localhost:6300",
 });
 
@@ -188,12 +202,18 @@ new MidnightChainAdapter({
   walletMode: "connector",
   connectorName: "1am",
   zkConfigBaseUrl: window.location.origin,
-  network: NetworkId.TestNet,
+  network: "preprod",
   proofServerEndpoint: "http://localhost:6300",
 });
 ```
 
-Requires a running Midnight proof server and a wallet funded with DUST.
+Requires a running Midnight proof server and a wallet funded with DUST. DUST chain fees are handled internally by the connected wallet — no explicit payment config is needed. Optionally pass `signingServerUrl` and `authToken` to route Midnight transaction balancing through [dStorage Pro](./managed-payments#what-is-dstorage-pro) instead of the local wallet.
+
+Start a local proof server with Docker (see [How do I start the local Midnight proof server?](./deployment-configuration#how-do-i-start-the-local-midnight-proof-server) in the Deployment section):
+
+```sh
+docker run -p 6300:6300 midnightntwrk/proof-server:8.0.3 -- midnight-proof-server -v
+```
 
 ### `PasswordEncryptionAdapter`
 
@@ -211,7 +231,13 @@ new PasswordEncryptionAdapter({
 });
 ```
 
-Post-quantum note: human-chosen passwords rarely reach 256-bit entropy. For the full ~192-bit post-quantum safety at the key layer, use a randomly generated `KeypairEncryptionAdapter` (`generateKeypair()`, secret key backed up separately). A password- or mnemonic-derived keypair (`fromPassword()` / `fromMnemonic()`) is bounded at ~128-bit by the derivation input's Grover ceiling — still the NIST minimum, but not 192-bit.
+::: warning Post-quantum note
+Human-chosen passwords rarely reach 256-bit entropy. For the full ~192-bit post-quantum safety at the key layer, use a randomly generated `KeypairEncryptionAdapter` (`generateKeypair()`, secret key backed up separately).
+
+A password- or mnemonic-derived keypair (`fromPassword()` / `fromMnemonic()`) is bounded at ~128-bit by the derivation input's Grover ceiling — still the NIST minimum, but not 192-bit.
+
+If you need a machine-generated credential instead of a human-chosen password, `generateHighEntropyPassword()` (see [What is `generateHighEntropyPassword()`?](./encryption-security#what-is-generatehighentropypassword) in the Encryption & Security section) produces a cryptographically random 43-character string with 256 bits of real entropy, reaching that same ~128-bit PQ floor when passed to `KeypairEncryptionAdapter.fromPassword()`.
+:::
 
 ### `MnemonicEncryptionAdapter`
 
@@ -235,19 +261,37 @@ The asymmetric design enables upload-only parties: an uploader who holds only th
 
 ```typescript
 // Generate a fresh keypair:
-const { adapter, secretKey } = KeypairEncryptionAdapter.generateKeypair();
+const { adapter, secretKey } = KeypairEncryptionAdapter.generateKeypair("myapp:v1");
 // adapter holds PK+SK — use for full read/write access
 // share adapter.publicKey with upload-only parties:
 const uploaderOnly = KeypairEncryptionAdapter.fromPublicKey(
   adapter.publicKey,
   "myapp:v1",
 );
-
-// Deterministic from a password (same inputs → same keypair):
-const adapter = await KeypairEncryptionAdapter.fromPassword(
-  "s3cr3t!",
-  "myapp:v1",
-);
 ```
 
 Key sizes for `mlkem768`: public key 1184 bytes, secret key 2400 bytes, KEM ciphertext 1088 bytes.
+
+A keypair can also be derived deterministically from a password instead of generated randomly, the same way `PasswordEncryptionAdapter` derives a symmetric KEK — same `password` + `salt` always recover the same ML-KEM keypair on any device, so there's no secret key to back up separately, only the password and salt:
+
+```typescript
+const adapter = await KeypairEncryptionAdapter.fromPassword(
+  "s3cr3t!",
+  "myapp:user-42", // salt
+  "myapp:kek:v1", // context — domain-separation string bound into the KEK derivation
+);
+```
+
+`KeypairEncryptionAdapter.fromMnemonic()` works the same way for a 24-word BIP-39 mnemonic or hex seed instead of a password:
+
+```typescript
+const adapter = await KeypairEncryptionAdapter.fromMnemonic(
+  { mnemonic: "word1 word2 … word24" },
+  "myapp:kek:v1", // context — domain-separation string bound into the KEK derivation
+);
+// or from a hex seed:
+const sameAdapter = await KeypairEncryptionAdapter.fromMnemonic(
+  { seedHex: "a1b2c3…" /* 32 or 64 bytes */ },
+  "myapp:kek:v1",
+);
+```

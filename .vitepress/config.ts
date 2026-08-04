@@ -85,7 +85,6 @@ gtag('config', '${GA_MEASUREMENT_ID}');`,
         {
           text: "Features",
           items: [
-            { text: "Overview", link: "/features/" },
             { text: "Developer Features", link: "/features/#developer-features" },
             { text: "End-User Features", link: "/features/#end-user-features" },
             {

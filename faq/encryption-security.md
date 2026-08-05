@@ -1,5 +1,15 @@
 # Encryption & Security
 
+### Does the SDK keep or hold any secrets, including wallet secrets?
+
+Some secret material is held in memory for as long as the SDK instance is alive, but none of it is persisted to disk or on-chain:
+
+- Encryption adapter secrets (passwords, mnemonics/seeds, keypairs) are held by their adapter. `MnemonicEncryptionAdapter` zeroes the raw seed from the JS heap immediately after construction; `KeypairEncryptionAdapter` holds its secret key until cleared.
+- `MidnightChainAdapter`'s wallet reference — including the raw wallet seed used to derive keys — is held in-memory by the SDK.
+- `ownerSecret` (used to prove on-chain ownership) is never stored at all — it's re-derived on demand from the DEK and `storageId` each time it's needed.
+
+Call `sdk.destroy()` to wipe all in-memory secret material at once. See [Should I call `sdk.destroy()` when I'm done, and why?](./developers#should-i-call-sdk-destroy-when-i-m-done-and-why) for the full breakdown of what gets cleared, and [What is `ownerSecret` and why is it not stored?](#what-is-ownersecret-and-why-is-it-not-stored) for detail on that value specifically.
+
 ### What encryption scheme does the SDK use?
 
 XChaCha20-Poly1305 with a 24-byte random nonce. Its 192-bit nonce space pushes the birthday bound to 2⁸⁰, making random nonce collision a non-issue in practice.

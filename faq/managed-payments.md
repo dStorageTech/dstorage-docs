@@ -14,10 +14,14 @@ Only a cryptographic hash of the content and the request metadata needed to cons
 
 The dStorage Pro portal (`https://dstorage.pro`) is the web dashboard where customers manage the account behind the managed payment service — it's the human-facing counterpart to the `signingServerUrl`/`authToken` API the SDK talks to. Log in (Google OAuth, MetaMask/SIWE, Lace, or the 1AM wallet extension) and a customer account lets you:
 
-- **Fund a balance** via the Liquidity Manager, using a credit card or crypto (BTC, USDT, USDC, NIGHT, AR) — this prepaid balance is what the managed service deducts from on every signed transaction. Some free DUST is also credited to customers for Midnight fee sponsorship.
+- **Fund a balance** via the Liquidity Manager, using a credit card or crypto (BTC, USDT, USDC, NIGHT, AR) — this prepaid balance is what the managed service deducts from on every signed transaction. Some free DUST is also credited to customers for Midnight fee sponsorship. [x402](#will-dstorage-pro-support-funding-accounts-via-x402) support for funding is planned.
 - **Create and manage API Tokens** — secret `ds_*` tokens for server-side use.
 - **Create and manage JWT Tokens** — scoped, revocable, ES256-signed tokens safe to embed in browser code.
 - **Monitor usage** on the Dashboard (request volume, success rate, liquidity consumed, network breakdown) and the Transaction History feed (service calls and payments, filterable, with status per entry).
+
+### Will dStorage Pro support funding accounts via x402?
+
+Yes — x402 support is planned as an additional way to fund a dStorage Pro account balance. [x402](https://www.x402.org/) is an open, HTTP-native micropayment protocol (built around the HTTP 402 "Payment Required" status code) that lets a client pay for a resource or top up a balance with a stablecoin transfer as part of the HTTP request/response flow, without a traditional checkout page. See the [x402 specification](https://github.com/coinbase/x402) for the protocol details. This isn't available yet — see [Where do I get an auth token?](#where-do-i-get-an-auth-token) for the current status of dStorage Pro sign-up and funding methods.
 
 ### How do I configure the managed payment flow?
 
@@ -71,7 +75,7 @@ new ArweaveBundlerStorageAdapter({
 
 If you need to call the managed service directly from browser JavaScript, don't use a `ds_*` token — use a JWT token instead, see [What is a JWT token and why does the service support it?](#what-is-a-jwt-token-and-why-does-the-service-support-it) below.
 
-Sign-up is not yet open to the public. dStorage Pro will soon open registration for new users, letting them sign up and fund their accounts through a range of payment methods. Follow [@dStorageTech on X](https://x.com/dStorageTech) for updates.
+Sign-up is not yet open to the public. dStorage Pro will soon open registration for new users, letting them sign up and fund their accounts through a range of payment methods, including x402. Follow [@dStorageTech on X](https://x.com/dStorageTech) for updates.
 
 ### How do I set the credentials via environment variables?
 

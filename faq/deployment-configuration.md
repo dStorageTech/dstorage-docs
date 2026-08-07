@@ -26,7 +26,7 @@ No real AR tokens are needed — arlocal auto-funds test wallets.
 
 ### What Midnight networks does the adapter support?
 
-Out of the box, with built-in default endpoints, `undeployed` (localhost) and `preprod`. Any other network works too — pass its name as `network` and explicitly supply `nodeEndpoint`, `nodeWsEndpoint`, `indexerEndpoint`, `indexerWsEndpoint`, and `proofServerEndpoint`; the adapter only rejects a network name if defaults are missing and any of those endpoints are left unset.
+Out of the box, with built-in default endpoints, `undeployed` (localhost), `preprod`, and `preview`. Any other network works too — pass its name as `network` and explicitly supply `nodeEndpoint`, `nodeWsEndpoint`, `indexerEndpoint`, `indexerWsEndpoint`, and `proofServerEndpoint`; the adapter only rejects a network name if defaults are missing and any of those endpoints are left unset.
 
 ### How do I configure `MidnightChainAdapter` for browser vs Node.js?
 

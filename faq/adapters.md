@@ -169,7 +169,7 @@ const sdk = new DStorage({
 
 ### `MidnightChainAdapter`
 
-Real Midnight network. Connects to the Midnight blockchain — `preprod` and `undeployed`/localhost have built-in default endpoints; any other network (e.g. `mainnet`) also works as long as you supply `nodeEndpoint`, `nodeWsEndpoint`, `indexerEndpoint`, `indexerWsEndpoint`, and `proofServerEndpoint` explicitly. Choose a `walletMode` based on your runtime:
+Real Midnight network. Connects to the Midnight blockchain — `preprod`, `preview`, and `undeployed`/localhost have built-in default endpoints; any other network (e.g. `mainnet`) also works as long as you supply `nodeEndpoint`, `nodeWsEndpoint`, `indexerEndpoint`, `indexerWsEndpoint`, and `proofServerEndpoint` explicitly. Choose a `walletMode` based on your runtime:
 
 - **`"provider"` (Node.js)**: you build and sync a `WalletFacade` yourself, then pass it as `walletProvider`. Also requires `privateStatePassword` (LevelDB encryption) and optionally `zkArtifactsPath` (absolute path to the `keys/` and `zkir/` directories).
 - **`"connector"` (browser)**: delegates all key management to a Midnight wallet extension — by default the first wallet discovered under `window.midnight`, or pass `connectorName` (e.g. `"1am"`) to prefer a specific one (matched by rdns, then declared name, then the injected key). Lace, 1AM, or any other wallet implementing the dApp Connector API works. Requires `zkConfigBaseUrl` set to the base URL from which the ZK artifacts are served.

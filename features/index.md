@@ -29,7 +29,7 @@ environment without changing your application code.
 
 ### Encryption & Recovery
 
-- Three encryption adapters: `PasswordEncryptionAdapter`, `MnemonicEncryptionAdapter` (BIP-39), and `KeypairEncryptionAdapter` (ML-KEM768, post-quantum). See [FAQ: Encryption & Security](/faq/encryption-security#encryption-security).
+- Four encryption adapters: `PasswordEncryptionAdapter`, `MnemonicEncryptionAdapter` (BIP-39), `KeypairEncryptionAdapter` (ML-KEM768, post-quantum), and `WebAuthnPrfEncryptionAdapter` (WebAuthn passkeys). See [FAQ: Encryption & Security](/faq/encryption-security#encryption-security).
 - Multi-key encryption — register multiple encryption adapters (e.g. a password plus a recovery mnemonic); any one can independently decrypt.
 - Key rotation (`rotateKeys()`) — add or remove encryption adapters without re-uploading content.
 - `generateHighEntropyPassword()` generates a machine-random, 256-bit password. Combined with `KeypairEncryptionAdapter`, it gives 128-bit (NIST-minimum) post-quantum protection at the key-encapsulation layer, while the password itself stays human-recoverable.
@@ -64,6 +64,7 @@ single storage/chain provider with their data.
 - Permanent, censorship-resistant decentralised storage.
 - Post-quantum protection options, guarding against "harvest now, decrypt later" threats. See [FAQ: Encryption & Security](/faq/encryption-security#encryption-security).
 - Cross-device recovery via password, mnemonic phrase, or keypair — no vendor account needed. See [FAQ: Adapters](/faq/adapters#adapters).
+- Passwordless unlock via WebAuthn passkeys — nothing to remember or type. See [Passkey Encryption](/guide/passkey-encryption).
 - Portable identity — the same credentials restore access to your data on any device.
 - Shared or delegated access, by registering more than one encryption adapter (e.g. a trusted recovery contact) — including upload-only delegation, where a party can encrypt content for you using your public key alone, without ever being able to decrypt it.
 - No vendor lock-in — the same data model works across multiple storage and chain providers.

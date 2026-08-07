@@ -11,7 +11,7 @@ DEK encrypts your data — and only your data for that one upload.
 
 The DEK itself then gets encrypted ("wrapped") under a separate key called the **KEK** (Key
 Encryption Key), which comes from whichever `encryptionAdapters` you configured (password,
-mnemonic, or keypair). The wrapped DEK is stored on-chain in a field called `keyEnvelope`.
+mnemonic, keypair, or passkey). The wrapped DEK is stored on-chain in a field called `keyEnvelope`.
 
 ```
 your data --[encrypted by]--> DEK --[wrapped by]--> KEK (from your adapter)

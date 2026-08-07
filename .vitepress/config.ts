@@ -74,6 +74,10 @@ gtag('config', '${GA_MEASUREMENT_ID}');`,
               link: "/guide/midnight-network-adapter",
             },
             {
+              text: "Passkey Encryption",
+              link: "/guide/passkey-encryption",
+            },
+            {
               text: "Managed Payments Service",
               link: "/guide/managed-payments-service",
             },

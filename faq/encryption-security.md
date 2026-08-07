@@ -25,6 +25,7 @@ A fresh random **Data Encryption Key (DEK)** is generated per upload. The DEK is
 | `PasswordEncryptionAdapter` | scrypt(password, salt)               | Conditional on password entropy | Yes — same password + salt on any device                          |
 | `MnemonicEncryptionAdapter` | BIP-39 (24-word) or 64-byte hex seed | 128-bit PQ (unconditional)      | Yes — same mnemonic on any device                                 |
 | `KeypairEncryptionAdapter`  | ML-KEM768 public/secret keypair      | 192-bit PQ for a random `generateKeypair()`; ~128-bit when derived via `fromPassword()` / `fromMnemonic()` (bounded by the derivation input's Grover ceiling) | Requires SK; re-derivable via `fromPassword()` / `fromMnemonic()` |
+| `WebAuthnPrfEncryptionAdapter` | WebAuthn PRF passkey (wraps an internal `MnemonicEncryptionAdapter` + `KeypairEncryptionAdapter`) | 128-bit PQ (unconditional — same tier as `MnemonicEncryptionAdapter`) | Depends on platform passkey sync (e.g. iCloud Keychain, Google Password Manager) — not portable for a device-bound hardware key |
 
 ### Why does `MnemonicEncryptionAdapter` require 24 words?
 

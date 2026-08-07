@@ -19,7 +19,7 @@ hero:
 features:
   - icon: 🔒
     title: Client-side encryption
-    details: Data is encrypted on the user's device using keys derived from a pluggable encryption adapter (password, mnemonic, or keypair) before it ever leaves.
+    details: Data is encrypted on the user's device using keys derived from a pluggable encryption adapter (password, mnemonic, keypair, or passkey) before it ever leaves.
   - icon: 🗄️
     title: Decentralised storage
     details: Encrypted blobs are stored on decentralised networks (Arweave, others coming soon) — no single party holds a plaintext copy.
@@ -31,7 +31,7 @@ features:
     details: Swap storage, chain, and encryption adapters independently — start with Mock everything and move to real infrastructure without changing application code.
   - icon: 🛡️
     title: Post-quantum options
-    details: Post-quantum-safe key wrapping — via ML-KEM768 keypairs, 24-word mnemonics, or machine-generated passwords — protects against "harvest now, decrypt later" threats.
+    details: Post-quantum-safe key wrapping — via ML-KEM768 keypairs, 24-word mnemonics, WebAuthn passkeys, or machine-generated passwords — protects against "harvest now, decrypt later" threats.
   - icon: 💳
     title: Managed payments
     details: Fund your dStorage Pro account to cover Arweave storage and Midnight DUST fees on behalf of your users — no AR wallet or funded Midnight wallet required on their end.

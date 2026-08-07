@@ -295,3 +295,67 @@ const sameAdapter = await KeypairEncryptionAdapter.fromMnemonic(
   "myapp:kek:v1",
 );
 ```
+
+### `WebAuthnPrfEncryptionAdapter`
+
+Passkey-based encryption via the WebAuthn PRF extension. Instead of a password or mnemonic, key material is derived from a platform passkey's PRF output — so there's nothing for the user to remember or type. Internally, it derives a seed from your passkey and uses it to build two things: a `MnemonicEncryptionAdapter` that locks and unlocks your uploads, and a fixed `KeypairEncryptionAdapter` whose public key you can safely share. Anyone holding that shared public key can encrypt something for you without ever touching your passkey — only you can unlock it, and only by using the passkey again.
+
+Two async static factories cover the two points where a user interacts with their passkey:
+
+```typescript
+// First visit — registers a new passkey
+const adapter = await WebAuthnPrfEncryptionAdapter.register();
+localStorage.setItem(
+  "credentialId",
+  btoa(String.fromCharCode(...adapter.credentialId)),
+);
+
+// Returning visits — re-authenticate with the stored credential
+const stored = localStorage.getItem("credentialId")!;
+const adapter = await WebAuthnPrfEncryptionAdapter.authenticate([
+  Uint8Array.from(atob(stored), (c) => c.charCodeAt(0)),
+]);
+```
+
+The adapter doesn't persist `credentialId` for you — your app is responsible for saving it (e.g. `localStorage`) and passing it back into `authenticate()` on later sessions, the same way it's responsible for `contractAddress` after `init()`.
+
+For upload-only delegation without a WebAuthn ceremony — e.g. a Node.js backend encrypting content on behalf of a browser-registered passkey owner — use the shared public key directly:
+
+```typescript
+const uploaderOnly = WebAuthnPrfEncryptionAdapter.fromPublicKey(adapter.publicKey);
+```
+
+`fromPublicKey()` also accepts an optional second argument, `{ shareContext, shareVariant }`, needed only if the owner customized those away from their defaults (see below) — it must match whatever the owner's `register()`/`authenticate()` call used.
+
+Check support before calling `register()`, since PRF isn't available everywhere:
+
+```typescript
+if (!(await WebAuthnPrfEncryptionAdapter.isSupported())) {
+  // fall back to PasswordEncryptionAdapter, MnemonicEncryptionAdapter, etc.
+}
+```
+
+Browser/authenticator support: WebAuthn PRF extension support in the browser, or a CTAP2 hardware key with `hmac-secret` support (e.g. a YubiKey 5). Call `isSupported()` first to check the current browser — it returns `false` rather than throwing where the PRF extension isn't available.
+
+For a flow with nothing to persist client-side at all, register with a resident (discoverable) credential and skip storing `credentialId`:
+
+```typescript
+// Register with a resident (discoverable) credential
+const adapter = await WebAuthnPrfEncryptionAdapter.register({
+  residentKey: "required",
+});
+
+// Later — no stored credentialId needed; the browser's native picker
+// shows any resident passkey for this origin
+const adapter = await WebAuthnPrfEncryptionAdapter.authenticate([], {
+  discoverable: true,
+});
+```
+
+`discoverable: true` omits `allowCredentials` from the WebAuthn call entirely, so the browser can present its native picker across any resident passkey instead of requiring a `credentialId` you supplied. It only works for a credential registered with `residentKey: "required"` (or `"preferred"`, depending on the authenticator) — the `credentialId`-based flow above remains the default.
+
+`register()`/`authenticate()` also accept a few advanced options for interoperating with a pre-existing, non-SDK passkey-encryption scheme — all default to the SDK's own current behavior, so they're only needed if you're matching an external derivation: `seedDerivation` (`"hkdf-expand"` default, or `"raw"` to use the PRF output directly as the seed) and `seedExpandInfo` (overrides the HKDF info label) control how the seed is derived; `shareContext` and `shareVariant` customize the internally-derived ML-KEM sharing keypair behind `.publicKey`/`fromPublicKey()` away from the SDK's fixed defaults.
+
+::: warning
+`register()` and `authenticate()` let the underlying `DOMException` (user cancellation, no matching credential, etc.) bubble up unwrapped rather than converting it to a `DStorageError` — catch `DOMException` directly around these calls.
+:::

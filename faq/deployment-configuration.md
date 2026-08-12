@@ -56,6 +56,14 @@ Browser (connector mode) — delegates to a wallet extension (1AM, Lace, or anot
 
 `walletMode` is required.
 
+### Does `WebAuthnPrfEncryptionAdapter` work in a Node.js app?
+
+Only partially. `register()` and `authenticate()` require real browser globals — `window`, `navigator.credentials`, `PublicKeyCredential` — and throw `WEBAUTHN_PRF_UNAVAILABLE` if they're missing, which is always the case in a plain Node.js process. `isSupported()` behaves the same way: it returns `false` (rather than throwing) whenever `window` is undefined.
+
+So the interactive passkey ceremony only runs in a real browser tab, or in an Electron **renderer** process (which exposes those same browser globals) — never in a Node.js backend, CLI, or Electron **main** process.
+
+The one part of the adapter that does work in Node is `fromPublicKey()`: it only needs raw public-key bytes and never touches WebAuthn, so a Node.js backend can use it for upload-only delegation on behalf of a browser-registered passkey owner (see [`WebAuthnPrfEncryptionAdapter`](/faq/adapters#webauthnprfencryptionadapter) in Adapters).
+
 ### How do I configure `ArweaveBundlerStorageAdapter` for managed uploads?
 
 ```typescript

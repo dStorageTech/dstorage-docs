@@ -359,3 +359,11 @@ const adapter = await WebAuthnPrfEncryptionAdapter.authenticate([], {
 ::: warning
 `register()` and `authenticate()` let the underlying `DOMException` (user cancellation, no matching credential, etc.) bubble up unwrapped rather than converting it to a `DStorageError` — catch `DOMException` directly around these calls.
 :::
+
+### Does `WebAuthnPrfEncryptionAdapter` work in a Node.js app?
+
+Only partially. `register()` and `authenticate()` require real browser globals — `window`, `navigator.credentials`, `PublicKeyCredential` — and throw `WEBAUTHN_PRF_UNAVAILABLE` if they're missing, which is always the case in a plain Node.js process. `isSupported()` behaves the same way: it returns `false` (rather than throwing) whenever `window` is undefined.
+
+So the interactive passkey ceremony only runs in a real browser tab, or in an Electron **renderer** process (which exposes those same browser globals) — never in a Node.js backend, CLI, or Electron **main** process.
+
+The one part of the adapter that does work in Node is `fromPublicKey()`: it only needs raw public-key bytes and never touches WebAuthn, so a Node.js backend can use it for upload-only delegation on behalf of a browser-registered passkey owner (see above).

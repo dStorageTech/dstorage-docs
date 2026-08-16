@@ -11,7 +11,7 @@
     "build": "vite build"
   },
   "dependencies": {
-    "@dstorage-tech/dstorage-sdk": "^0.0.15"
+    "@dstorage-tech/dstorage-sdk": "^0.0.16"
   },
   "overrides": {
     "axios": "^1.18.1",
@@ -28,5 +28,19 @@
     "vite-plugin-node-polyfills": "^0.28.0",
     "vite-plugin-top-level-await": "^1.6.0",
     "vite-plugin-wasm": "^3.6.0"
+  },
+  "allowScripts": {
+    "@swc/core@1.16.0": true,
+    "bigint-buffer@1.1.5": true,
+    "bufferutil@4.1.0": true,
+    "keccak@3.0.4": true,
+    "keccak@3.0.2": true,
+    "classic-level@3.0.0": true,
+    "esbuild@0.14.54": true,
+    "esbuild@0.28.2": true,
+    "msgpackr-extract@3.0.4": true,
+    "utf-8-validate@6.0.6": true,
+    "utf-8-validate@5.0.10": true,
+    "secp256k1@5.0.0": true
   }
 }

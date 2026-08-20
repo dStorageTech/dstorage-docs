@@ -89,7 +89,7 @@ The `authToken` uses the compound `ds_<credential>.<base64url_modulus>` format. 
 
 ### `MockChainAdapter`
 
-In-memory chain adapter for development and testing. Stores on-chain references in an in-memory `Map` on Node.js or in `localStorage` in the browser (browser state survives page reloads). Enforces the same SHA-256 `ownerSecret` commitment check as the real DataRegistry contract, so ownership-gated operations (`removeReference`, `updateReference`) behave correctly in tests. `refId` values are UUID-style strings rather than the Bytes<32> format produced by the real circuit. Requires no Midnight node, proof server, indexer, or DUST tokens.
+In-memory chain adapter for development and testing. Stores on-chain references in an in-memory `Map` on Node.js or in `localStorage` in the browser (browser state survives page reloads). Enforces the same SHA-256 `ownerSecret` commitment check as the real DataRegistry contract, so ownership-gated operations (`removeReference`, `updateReference`) behave correctly in tests. `refId` values are UUID-style strings rather than the Bytes<32> format produced by the real circuit. Requires no Midnight node, proof server, indexer, or DUST tokens. Optionally accepts `signingServerUrl` and `authToken` to exercise managed payment request/response round-trips in tests without touching real funds.
 
 ```typescript
 const sdk = new DStorage({

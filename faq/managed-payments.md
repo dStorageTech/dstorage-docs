@@ -106,7 +106,9 @@ The managed service covers Arweave storage costs billed in AR, and — when `Mid
 
 ### How do I test the managed payment code path without spending real funds?
 
-Today, use `MockStorageAdapter` and `MidnightSimulatorChainAdapter` with `signingServerUrl` and `authToken` set to your dStorage Pro account and token. Both adapters automatically use the `managedmock` payment network, which sends the network identifier `"TEST"` to the server instead of the real network name that a production adapter would send. This exercises the full managed payment request/response round-trip — including auth token pinning and error handling — without touching real funds.
+Today, use `MockStorageAdapter` and either `MockChainAdapter` or `MidnightSimulatorChainAdapter` with `signingServerUrl` and `authToken` set to your dStorage Pro account and token. All three adapters automatically use the `managedmock` payment network, which sends the network identifier `"TEST"` to the server instead of the real network name that a production adapter would send. This exercises the full managed payment request/response round-trip — including auth token pinning and error handling — without touching real funds.
+
+`MockChainAdapter` is the lighter-weight option — an in-memory chain simulation with no real circuit logic. Use `MidnightSimulatorChainAdapter` instead when you also want to exercise the real DataRegistry Compact circuits (ownership checks, ref-id derivation) locally.
 
 ```typescript
 const sdk = new DStorage({

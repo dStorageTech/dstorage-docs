@@ -121,7 +121,7 @@ gtag('config', '${GA_MEASUREMENT_ID}');`,
       { icon: "x", link: "https://x.com/dStorageTech", ariaLabel: "X" },
       {
         icon: "linkedin",
-        link: "https://www.linkedin.com/showcase/dstorage-tech",
+        link: "https://www.linkedin.com/company/dstorage-tech",
         ariaLabel: "LinkedIn",
       },
       {

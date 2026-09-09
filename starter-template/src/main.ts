@@ -6,7 +6,7 @@ import {
 } from "@dstorage-tech/dstorage-sdk";
 
 // This entry matches the "Midnight Network Adapter" guide at
-// https://dstorage.pro/docs/guide/midnight-network-adapter
+// https://dstorage.pro/docs/guide/midnight-network-adapter.html
 // Run `npm run dev`, open the printed URL, and click the button — the wallet
 // will prompt you to connect the first time sdk.init() runs.
 

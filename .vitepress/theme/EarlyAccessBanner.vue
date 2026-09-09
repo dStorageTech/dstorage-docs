@@ -25,7 +25,7 @@ onUnmounted(() => {
   <div ref="bannerEl" class="early-access-banner">
     <span class="badge">Early Access</span>
     <span class="copy">
-      The dStorage SDK is under active development (<code>v0.0.x</code>). APIs may still
+      The dStorage SDK is under active development (<code>v0.1.x</code>). APIs may still
       change — it's safe to follow the guides, but hold off on production use for now.
     </span>
   </div>

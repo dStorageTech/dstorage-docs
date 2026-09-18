@@ -44,10 +44,10 @@ The `--rm` flag used when starting the container cleans it up automatically once
 This guide keeps the same three-adapter shape from Mock Adapters, but swaps two of them out for
 versions that behave like the real thing — only `encryptionAdapters` stays as-is:
 
-- **`storageAdapter`** — `ArweaveLocalStorageAdapter.createWithTestWallet()` replaces
+- **`storageAdapters`** — `ArweaveLocalStorageAdapter.createWithTestWallet()` replaces
   `MockStorageAdapter`. It generates a fresh, disposable JWK test wallet (not connected to real
   funds) and funds it with test AR against your running arlocal instance.
-- **`chainAdapter`** — `MidnightSimulatorChainAdapter` replaces `MockChainAdapter`, running the
+- **`chainAdapters`** — `MidnightSimulatorChainAdapter` replaces `MockChainAdapter`, running the
   real `DataRegistry` contract logic in-process instead of simulating it in memory. It's still
   not talking to the Midnight network — no node, indexer, or proof server involved — just a much
   more faithful in-process simulator than `MockChainAdapter`'s.
@@ -67,8 +67,8 @@ const { adapter: storageAdapter } = await ArweaveLocalStorageAdapter.createWithT
 });
 
 const sdk = new DStorage({
-  storageAdapter,
-  chainAdapter: new MidnightSimulatorChainAdapter(),
+  storageAdapters: [storageAdapter],
+  chainAdapters: [new MidnightSimulatorChainAdapter()],
   encryptionAdapters: [
     new PasswordEncryptionAdapter({
       password: "Correct-Horse-Battery!",

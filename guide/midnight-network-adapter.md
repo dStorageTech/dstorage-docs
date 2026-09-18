@@ -84,8 +84,8 @@ const chainAdapter = new MidnightChainAdapter({
 });
 
 const sdk = new DStorage({
-  storageAdapter,
-  chainAdapter,
+  storageAdapters: [storageAdapter],
+  chainAdapters: [chainAdapter],
   encryptionAdapters: [
     new PasswordEncryptionAdapter({
       password: "Correct-Horse-Battery!",

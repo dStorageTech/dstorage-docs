@@ -35,17 +35,21 @@ import {
 } from "@dstorage-tech/dstorage-sdk";
 
 const sdk = new DStorage({
-  storageAdapter: new ArweaveBundlerStorageAdapter({
-    signingServerUrl:
-      process.env.DSTORAGE_SERVICE_URL ?? "https://dstorage.pro",
-    authToken: process.env.DSTORAGE_AUTH_TOKEN ?? "",
-  }),
-  chainAdapter: new MidnightChainAdapter({
-    // … chain config …
-    signingServerUrl:
-      process.env.DSTORAGE_SERVICE_URL ?? "https://dstorage.pro",
-    authToken: process.env.DSTORAGE_AUTH_TOKEN ?? "",
-  }),
+  storageAdapters: [
+    new ArweaveBundlerStorageAdapter({
+      signingServerUrl:
+        process.env.DSTORAGE_SERVICE_URL ?? "https://dstorage.pro",
+      authToken: process.env.DSTORAGE_AUTH_TOKEN ?? "",
+    }),
+  ],
+  chainAdapters: [
+    new MidnightChainAdapter({
+      // … chain config …
+      signingServerUrl:
+        process.env.DSTORAGE_SERVICE_URL ?? "https://dstorage.pro",
+      authToken: process.env.DSTORAGE_AUTH_TOKEN ?? "",
+    }),
+  ],
   encryptionAdapters: [
     /* … */
   ],
@@ -112,14 +116,18 @@ Today, use `MockStorageAdapter` and either `MockChainAdapter` or `MidnightSimula
 
 ```typescript
 const sdk = new DStorage({
-  storageAdapter: new MockStorageAdapter({
-    signingServerUrl: "https://dstorage.pro",
-    authToken: process.env.DSTORAGE_AUTH_TOKEN ?? "",
-  }),
-  chainAdapter: new MidnightSimulatorChainAdapter({
-    signingServerUrl: "https://dstorage.pro",
-    authToken: process.env.DSTORAGE_AUTH_TOKEN ?? "",
-  }),
+  storageAdapters: [
+    new MockStorageAdapter({
+      signingServerUrl: "https://dstorage.pro",
+      authToken: process.env.DSTORAGE_AUTH_TOKEN ?? "",
+    }),
+  ],
+  chainAdapters: [
+    new MidnightSimulatorChainAdapter({
+      signingServerUrl: "https://dstorage.pro",
+      authToken: process.env.DSTORAGE_AUTH_TOKEN ?? "",
+    }),
+  ],
   encryptionAdapters: [
     /* … */
   ],

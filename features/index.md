@@ -21,9 +21,10 @@ environment without changing your application code.
 ### Architecture & Core Capabilities
 
 - Pluggable adapter architecture — storage, chain, encryption, and payment are each configured independently and can be swapped without touching call sites. See [Core Concepts](/guide/core-concepts).
+- Multiple storage/chain adapters with automatic fallback — configure `storageAdapters`/`chainAdapters` as ordered lists; reads and writes fall back to the next candidate on failure. See [Adapters](/faq/adapters#how-do-multiple-storage-chain-adapters-and-fallback-work).
 - No custom on-chain contract to write or deploy — the DataRegistry contract ships pre-compiled with the SDK, so integrating dStorage doesn't require Compact expertise.
 - `estimateCost()` — a pre-upload cost estimate covering both the storage and chain side, before you commit to a `store()` call.
-- Storage-only mode — omit `chainAdapter` to skip on-chain references entirely.
+- Storage-only mode — omit `chainAdapters` (or pass `[]`) to skip on-chain references entirely.
 - Works in both Node.js and the browser, with a dedicated browser entry point.
 - TypeScript-first, with strict typing throughout.
 

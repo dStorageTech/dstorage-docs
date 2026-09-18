@@ -35,8 +35,8 @@ async function run() {
   });
 
   const sdk = new DStorage({
-    storageAdapter,
-    chainAdapter,
+    storageAdapters: [storageAdapter],
+    chainAdapters: [chainAdapter],
     encryptionAdapters: [
       new PasswordEncryptionAdapter({
         password: "Correct-Horse-Battery!",

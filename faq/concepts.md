@@ -43,7 +43,7 @@ A 43-character base64url string (32 decoded bytes) that identifies the encrypted
 
 ### Does dStorage work without a blockchain?
 
-Yes. Omit `chainAdapter` from `DStorageConfig` to run in storage-only mode. Uploads go directly to the storage network; no on-chain reference is written. `store()` still returns a `storageId` for later retrieval, but there is no verifiable on-chain ownership record.
+Yes. Omit `chainAdapters` (or pass `[]`) from `DStorageConfig` to run in storage-only mode. Uploads go directly to the storage network; no on-chain reference is written. `store()` still returns a `storageId` for later retrieval, but there is no verifiable on-chain ownership record.
 
 ### Does dStorage support large files?
 

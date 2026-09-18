@@ -13,10 +13,12 @@ import {
 async function main() {
   const sdk = new DStorage({
     // Where the encrypted bytes are stored — in-memory for Mock, real storage in later guides.
-    storageAdapter: new MockStorageAdapter(),
+    // Tried in order; add more entries to fall back to another storage backend on failure.
+    storageAdapters: [new MockStorageAdapter()],
 
     // Where the on-chain reference is written — simulated in-memory here.
-    chainAdapter: new MockChainAdapter(),
+    // Optional — omit or pass [] for storage-only mode.
+    chainAdapters: [new MockChainAdapter()],
 
     // How the per-upload encryption key is protected — derived from a password + salt.
     encryptionAdapters: [
@@ -27,7 +29,7 @@ async function main() {
     ],
   });
 
-  // Prepares the SDK — deploys/joins the on-chain DataRegistry when a chainAdapter is configured.
+  // Prepares the SDK — deploys/joins the on-chain DataRegistry when chainAdapters is configured.
   await sdk.init();
 
   // Encrypts the bytes client-side and uploads them; returns the on-chain reference id.

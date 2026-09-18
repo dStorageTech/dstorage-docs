@@ -11,8 +11,8 @@ import {
 } from "@dstorage-tech/dstorage-sdk";
 
 const sdk = new DStorage({
-  storageAdapter: new MockStorageAdapter(),
-  chainAdapter: new MockChainAdapter(),
+  storageAdapters: [new MockStorageAdapter()],
+  chainAdapters: [new MockChainAdapter()],
   encryptionAdapters: [
     new PasswordEncryptionAdapter({
       password: "Correct-Horse-Battery!",
@@ -29,7 +29,7 @@ Mock adapters are fully in-memory — no network, no Docker, no tokens required.
 
 ### What does `sdk.init()` do?
 
-`init()` prepares the SDK for use: it derives the chain encryption key and, if a `chainAdapter` is configured, calls `chainAdapter.init()` which either deploys a new `DataRegistry` contract or joins an existing one. You must call `init()` before `store()` or `retrieveByRefId()` when using private (encrypted) data.
+`init()` prepares the SDK for use: it derives the chain encryption key and, if `chainAdapters` is configured, calls each configured chain adapter's `init()` in order — stopping as soon as one succeeds — which either deploys a new `DataRegistry` contract or joins an existing one. You must call `init()` before `store()` or `retrieveByRefId()` when using private (encrypted) data.
 
 ### Should I call `sdk.destroy()` when I'm done, and why?
 
@@ -168,7 +168,7 @@ The [Midnight Bulletin Board](https://github.com/midnightntwrk/example-bboard) i
 
 ### How do I update the content stored at an existing reference?
 
-Use `sdk.update(refId, newBytes, options?)`. It encrypts the new content with a fresh per-upload encryption key, uploads it to the storage network, then calls `chainAdapter.updateReference()` — proving ownership with the old `ownerSecret` and registering the new one atomically.
+Use `sdk.update(refId, newBytes, options?)`. It encrypts the new content with a fresh per-upload encryption key, uploads it to the storage network, then locates whichever configured chain adapter actually holds the reference and calls its `updateReference()` — proving ownership with the old `ownerSecret` and registering the new one atomically.
 
 - The on-chain pointer is updated in place; the `refId` stays the same.
 - Old content is **not** deleted from the storage network — only the on-chain pointer changes.
@@ -193,8 +193,8 @@ Requires the chain adapter to implement `updateReference()` (same as `update()`)
 ```typescript
 // Add a recovery key to an existing reference
 const sdk = new DStorage({
-  storageAdapter,
-  chainAdapter,
+  storageAdapters: [storageAdapter],
+  chainAdapters: [chainAdapter],
   encryptionAdapters: [
     new PasswordEncryptionAdapter({ password, salt }), // existing
     new MnemonicEncryptionAdapter({ mnemonic: backupPhrase }), // new recovery
@@ -206,7 +206,9 @@ await sdk.rotateKeys(refId);
 
 ### How do I list all my on-chain references?
 
-Call `sdk.listReferences()`. It returns a `DataReferenceSummary[]` — one entry per reference in the DataRegistry contract — containing the `refId`, decrypted `storageId`, `storageProvider`, `writtenAt`, and any attached metadata. The SDK automatically decrypts each entry using the configured adapters; references whose envelope cannot be decrypted are returned with a `decryptionError` field rather than throwing.
+Call `sdk.listReferences()`. It returns a `ListedDataReference[]` — one entry per reference in the DataRegistry contract — containing the `refId`, decrypted `storageId`, `storageProvider`, `writtenAt`, and any attached metadata. The SDK automatically decrypts each entry using the configured adapters; references whose envelope cannot be decrypted are returned with a `decryptionError` field rather than throwing.
+
+The no-filter (aggregate) path queries every configured chain adapter instead of stopping at the first success, so results may span multiple chains. Each returned reference is tagged with `sourceAdapterIndex`, the zero-based index into `chainAdapters` it came from — useful since `ChainAdapter.name`/`.providerName` isn't guaranteed unique per instance.
 
 To look up a known subset without fetching the entire list, pass `refIds`:
 
@@ -215,7 +217,7 @@ const all = await sdk.listReferences();
 const specific = await sdk.listReferences({ refIds: [refId1, refId2] });
 ```
 
-Requires a chain adapter. The full (no-filter) path additionally requires the adapter to implement `listReferences()`.
+Requires at least one chain adapter. The full (no-filter) path additionally requires at least one configured adapter to implement `listReferences()`.
 
 ### How do I remove an on-chain reference?
 

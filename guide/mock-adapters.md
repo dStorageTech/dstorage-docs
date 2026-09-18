@@ -24,12 +24,15 @@ npm install @dstorage-tech/dstorage-sdk
 
 `DStorage` is configured with three kinds of adapters, each with a distinct job:
 
-- **`storageAdapter`** — where the encrypted bytes are stored. `MockStorageAdapter` keeps them
+- **`storageAdapters`** — where the encrypted bytes are stored. `MockStorageAdapter` keeps them
   in memory.
-- **`chainAdapter`** — where the on-chain reference (the tamper-proof pointer to your data) is
+- **`chainAdapters`** — where the on-chain reference (the tamper-proof pointer to your data) is
   written. `MockChainAdapter` simulates this without a real blockchain.
 - **`encryptionAdapters`** — how the per-upload encryption key is protected.
   `PasswordEncryptionAdapter` derives it from a password you provide.
+
+`storageAdapters` and `chainAdapters` are both arrays — pass a single-entry array unless you want
+fallback across multiple adapters (see [Adapters](/faq/adapters#how-do-multiple-storage-chain-adapters-and-fallback-work)).
 
 ```typescript
 import {
@@ -40,8 +43,8 @@ import {
 } from "@dstorage-tech/dstorage-sdk";
 
 const sdk = new DStorage({
-  storageAdapter: new MockStorageAdapter(),
-  chainAdapter: new MockChainAdapter(),
+  storageAdapters: [new MockStorageAdapter()],
+  chainAdapters: [new MockChainAdapter()],
   encryptionAdapters: [
     new PasswordEncryptionAdapter({
       password: "Correct-Horse-Battery!",
@@ -69,7 +72,7 @@ console.log(new TextDecoder().decode(bytes)); // "hello, dStorage"
 
 What happened at each step:
 
-1. **`sdk.init()`** prepares the SDK — with a `chainAdapter` configured, this is where the
+1. **`sdk.init()`** prepares the SDK — with `chainAdapters` configured, this is where the
    `DataRegistry` contract gets deployed (or joined, if you passed an existing address — more on
    that in the [Midnight Network Adapter](/guide/midnight-network-adapter) guide).
 2. **`sdk.store()`** encrypts your data on the client with a fresh random key before anything

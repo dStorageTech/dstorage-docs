@@ -6,11 +6,32 @@ Adapters are the pluggable components you pass to `DStorage` to tell it _where_ 
 
 | Slot       | Config field          | Role                                                    | Required?                                              |
 | ---------- | ---------------------- | -------------------------------------------------------- | -------------------------------------------------------|
-| Storage    | `storageAdapter`     | Receives encrypted bytes and returns a `storageId`      | Always                                                 |
-| Chain      | `chainAdapter`       | Writes the encrypted pointer and key envelope on-chain  | Optional — omit for storage-only mode                  |
+| Storage    | `storageAdapters`    | Receives encrypted bytes and returns a `storageId`      | Always — at least one                                  |
+| Chain      | `chainAdapters`      | Writes the encrypted pointer and key envelope on-chain  | Optional — omit or pass `[]` for storage-only mode      |
 | Encryption | `encryptionAdapters` | Wraps the per-upload DEK under each adapter's KEK       | Optional — omit for public (`isPublic: true`) uploads  |
 
+`storageAdapters` and `chainAdapters` are both arrays, tried in priority order. Reads and writes fall back to the next configured adapter on failure and succeed as soon as one works — a single-entry array behaves exactly as a single adapter always did. `listReferences()` is the one exception: it aggregates results across every configured chain adapter instead of stopping at the first success, since references may legitimately live on more than one. See [How do multiple storage/chain adapters and fallback work?](#how-do-multiple-storage-chain-adapters-and-fallback-work) below.
+
 You can supply multiple encryption adapters; any single registered adapter can independently decrypt any upload made while it was in the list.
+
+### How do multiple storage/chain adapters and fallback work?
+
+`storageAdapters: StorageAdapter[]` and `chainAdapters?: ChainAdapter[]` are ordered lists of fallback candidates, not a single adapter each:
+
+```typescript
+const sdk = new DStorage({
+  storageAdapters: [primaryArweaveAdapter, mirrorArweaveAdapter],
+  chainAdapters: [midnightAdapter], // omit or [] for storage-only mode
+  encryptionAdapters: [adapter],
+});
+```
+
+- **Reads and writes** try each configured adapter in order and fall back to the next on failure, succeeding as soon as one works. A single-candidate list rethrows its original error verbatim, so single-adapter behavior and error codes are unchanged from before multi-adapter support existed. If every candidate fails, the SDK throws an aggregate error (`STORAGE_READ_ALL_FAILED`/`STORAGE_WRITE_ALL_FAILED` for storage, `CHAIN_READ_ALL_FAILED`/`CHAIN_WRITE_ALL_FAILED` for chain) whose `.cause` is an array of `{ adapterName, error }` — one entry per candidate tried.
+- **`listReferences()`** aggregates results from every configured chain adapter instead of stopping at the first success. Each returned reference is tagged with `sourceAdapterIndex`, the zero-based index into `chainAdapters` it came from — useful because `ChainAdapter.name`/`.providerName` isn't guaranteed unique per instance (e.g. two Midnight configs pointed at different networks both report `"midnight"`).
+- **Single-reference mutations** (`update()`, `retryUpdate()`, `rotateKeys()`, `removeReference()`) locate whichever configured chain adapter actually holds the reference and target it directly.
+- **`init()`** stops trying chain adapters as soon as one succeeds.
+- **Chunked uploads** (>10 MB) retry the *whole* upload — not per-chunk — against the next storage adapter candidate if the first fails partway through. `StoreProgress.attemptIndex` tells you which candidate a given progress event belongs to, so a rewind to `chunksUploaded: 0` reads as "retrying against the next adapter" rather than data corruption. Chunk *retrieval* stays pinned to whichever adapter served the manifest.
+- There is no more hard failure when a reference's recorded `storageProvider` doesn't match a configured adapter's name (the old `STORAGE_ADAPTER_MISMATCH` error is gone) — retrieval simply tries each configured storage adapter in order regardless of that field.
 
 ### `MockStorageAdapter`
 
@@ -18,8 +39,8 @@ In-memory storage for development and testing. Stores encrypted bytes in an in-m
 
 ```typescript
 const sdk = new DStorage({
-  storageAdapter: new MockStorageAdapter(),
-  chainAdapter: new MockChainAdapter(),
+  storageAdapters: [new MockStorageAdapter()],
+  chainAdapters: [new MockChainAdapter()],
   encryptionAdapters: [adapter],
 });
 ```
@@ -32,7 +53,7 @@ Local Arweave integration testing. A drop-in replacement for `ArweaveStorageAdap
 const { adapter } = await ArweaveLocalStorageAdapter.createWithTestWallet({
   fundAr: 5,
 });
-const sdk = new DStorage({ storageAdapter: adapter /* … */ });
+const sdk = new DStorage({ storageAdapters: [adapter] /* … */ });
 ```
 
 The adapter exposes a `.testnet` helper with utilities for controlling the local node: `mine(blocks)` to fast-forward the blockchain, `mintTokens(address, winstons)` to fund wallets, `getBalance(address)`, `isRunning()`, and `reset()` for a clean slate between test runs.
@@ -51,15 +72,17 @@ Permanent Arweave storage. Uploads to the Arweave permaweb: pay once, store fore
 ```typescript
 // Browser — ArConnect handles signing
 const sdk = new DStorage({
-  storageAdapter: new ArweaveStorageAdapter(),
+  storageAdapters: [new ArweaveStorageAdapter()],
   // …
 });
 
 // Node.js — JWK wallet file
 const sdk = new DStorage({
-  storageAdapter: new ArweaveStorageAdapter({
-    walletKey: JSON.parse(fs.readFileSync("wallet.json", "utf8")),
-  }),
+  storageAdapters: [
+    new ArweaveStorageAdapter({
+      walletKey: JSON.parse(fs.readFileSync("wallet.json", "utf8")),
+    }),
+  ],
   // …
 });
 ```
@@ -74,11 +97,13 @@ Fast finality via managed signing. Uploads via the ANS-104 Arweave bundler, whic
 
 ```typescript
 const sdk = new DStorage({
-  storageAdapter: new ArweaveBundlerStorageAdapter({
-    signingServerUrl:
-      process.env.DSTORAGE_SERVICE_URL ?? "https://dstorage.pro",
-    authToken: process.env.DSTORAGE_AUTH_TOKEN ?? "",
-  }),
+  storageAdapters: [
+    new ArweaveBundlerStorageAdapter({
+      signingServerUrl:
+        process.env.DSTORAGE_SERVICE_URL ?? "https://dstorage.pro",
+      authToken: process.env.DSTORAGE_AUTH_TOKEN ?? "",
+    }),
+  ],
   // …
 });
 ```
@@ -93,8 +118,8 @@ In-memory chain adapter for development and testing. Stores on-chain references 
 
 ```typescript
 const sdk = new DStorage({
-  storageAdapter: new MockStorageAdapter(),
-  chainAdapter: new MockChainAdapter(),
+  storageAdapters: [new MockStorageAdapter()],
+  chainAdapters: [new MockChainAdapter()],
   encryptionAdapters: [adapter],
 });
 ```
@@ -161,8 +186,8 @@ Use this adapter when you need realistic ZK circuit behavior (correct `refId` fo
 
 ```typescript
 const sdk = new DStorage({
-  storageAdapter: new ArweaveLocalStorageAdapter(/* … */),
-  chainAdapter: new MidnightSimulatorChainAdapter(),
+  storageAdapters: [new ArweaveLocalStorageAdapter(/* … */)],
+  chainAdapters: [new MidnightSimulatorChainAdapter()],
   encryptionAdapters: [adapter],
 });
 ```

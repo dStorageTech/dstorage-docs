@@ -41,7 +41,7 @@ config in Step 2.
 
 ## Step 2 — Add managed payments to your adapters
 
-Starting from the same connector-mode `chainAdapter` as the Midnight Network Adapter guide, two
+Starting from the same connector-mode chain adapter as the Midnight Network Adapter guide, two
 things change: the storage adapter swaps to `ArweaveBundlerStorageAdapter`, and both adapters get
 a `signingServerUrl`/`authToken`.
 
@@ -57,20 +57,24 @@ const signingServerUrl = "https://dstorage.pro";
 const authToken = "your_jwt_token_here";
 
 const sdk = new DStorage({
-  storageAdapter: new ArweaveBundlerStorageAdapter({
-    signingServerUrl,
-    authToken,
-  }),
+  storageAdapters: [
+    new ArweaveBundlerStorageAdapter({
+      signingServerUrl,
+      authToken,
+    }),
+  ],
 
-  chainAdapter: new MidnightChainAdapter({
-    walletMode: "connector",
-    connectorName: "1am",
-    zkConfigBaseUrl: window.location.origin,
-    network: "preprod",
-    proofServerEndpoint: "http://localhost:6300",
-    signingServerUrl,
-    authToken,
-  }),
+  chainAdapters: [
+    new MidnightChainAdapter({
+      walletMode: "connector",
+      connectorName: "1am",
+      zkConfigBaseUrl: window.location.origin,
+      network: "preprod",
+      proofServerEndpoint: "http://localhost:6300",
+      signingServerUrl,
+      authToken,
+    }),
+  ],
 
   encryptionAdapters: [
     new PasswordEncryptionAdapter({

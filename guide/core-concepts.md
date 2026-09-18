@@ -44,9 +44,15 @@ question:
 
 | Slot                  | Answers                                   | Required?                             |
 | ---------------------- | ------------------------------------------ | -------------------------------------- |
-| `storageAdapter`      | Where do the encrypted bytes live?        | Always                                |
-| `chainAdapter`        | Where's the on-chain reference written?   | Optional — omit for storage-only mode |
+| `storageAdapters`     | Where do the encrypted bytes live?        | Always — at least one                 |
+| `chainAdapters`       | Where's the on-chain reference written?   | Optional — omit or `[]` for storage-only mode |
 | `encryptionAdapters`  | How is the per-upload encryption key protected? | Optional — omit for public uploads    |
+
+`storageAdapters` and `chainAdapters` are ordered lists, not single values — reads and writes try
+each configured adapter in turn and fall back to the next on failure. A single-entry list behaves
+exactly like the single-adapter config these guides show. See
+[Adapters](../faq/adapters#how-do-multiple-storage-chain-adapters-and-fallback-work) for the full
+fallback semantics.
 
 Because these are independent, you can mix and match: start with Mock everything for local
 development, swap in `ArweaveLocalStorageAdapter` once you want realistic storage behavior, then

@@ -81,7 +81,7 @@ walkthrough. dStorage Pro is live — claim your Pro Pass at [portal.dstorage.pr
 
 - Managed Arweave signing — no AR wallet or JWK key file needed client-side.
 - Two managed storage-signing options: near-instant finality via the ANS-104 bundler protocol (`ArweaveBundlerStorageAdapter`), or direct Arweave L1 submission (`ArweaveStorageAdapter`) for callers who prefer L1's 2–20 minute confirmation semantics.
-- Managed Midnight DUST-fee payment — no funded Midnight wallet needed either, with sponsorship in some cases.
+- Managed Midnight DUST-fee payment — no funded Midnight wallet needed either, with sponsorship in some cases. See [Managed Payments on Midnight](/guide/managed-payments-midnight).
 - Privacy-preserving signing — your file bytes never leave the client and are never sent to or seen by the signing server. Only a cryptographic hash of the content, plus the metadata needed to construct the transaction, is transmitted; the content itself and your encryption keys are never shared with dStorage Pro.
 - Two token types: `ds_*` secret tokens (full account access, server-side only) and scoped JWT tokens (browser-safe, with origin/spend/request caps and instant revocation).
 - Signing-key pinning — the auth token embeds the server's public key, so a key rotation or substitution is detected immediately.

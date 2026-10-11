@@ -15,3 +15,4 @@ and swap in each guide's adapters as you go.
 - **[Managed Payments Service](/guide/managed-payments-service)** — route storage and chain payments through dStorage Pro's `TEST` sandbox service, still on arlocal and the simulator.
 - **[Midnight Network Adapter](/guide/midnight-network-adapter)** — a real Midnight network, a real wallet, and a live proof server.
 - **[Passkey Encryption](/guide/passkey-encryption)** — swap in `WebAuthnPrfEncryptionAdapter` to unlock uploads with a platform passkey instead of a password.
+- **[Managed Payments on Midnight](/guide/managed-payments-midnight)** — a real Midnight network with DUST fees sponsored via dStorage Pro's managed service, so the wallet needs no DUST or NIGHT.

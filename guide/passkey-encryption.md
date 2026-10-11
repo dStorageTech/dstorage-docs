@@ -132,3 +132,5 @@ What's different about unlocking:
   so any one of them can unlock the same upload.
 - The [Encryption & Security FAQ](/faq/encryption-security#encryption-security) compares their
   post-quantum security tradeoffs.
+- Next: [Managed Payments on Midnight](/guide/managed-payments-midnight), the final guide in this
+  series, has dStorage Pro sponsor the Midnight DUST fees so the wallet needs no DUST or NIGHT.

@@ -12,7 +12,7 @@ Only a cryptographic hash of the content and the request metadata needed to cons
 
 ### What is the dStorage Pro portal?
 
-The dStorage Pro portal (`https://portal.dstorage.pro`) is the web dashboard where customers manage the account behind the managed payment service — it's the human-facing counterpart to the `signingServerUrl`/`authToken` API the SDK talks to. Log in with Lace, MetaMask (SIWE), or the 1AM wallet extension (Google sign-in is coming soon) and a customer account lets you:
+The dStorage Pro portal (`https://portal.dstorage.pro`) is the web dashboard where customers manage the account behind the managed payment service — it's the human-facing counterpart to the `signingServerUrl`/`authToken` API the SDK talks to. Log in with Google, Lace, MetaMask (SIWE), or the 1AM wallet extension and a customer account lets you:
 
 - **Fund a balance** via the Liquidity Manager, using a card, bank transfer, local payment methods, or a coupon — this prepaid balance is what the managed service deducts from on every signed transaction. Some free DUST is also credited to customers for Midnight fee sponsorship. [x402](#will-dstorage-pro-support-funding-accounts-via-x402) support for funding is planned.
 - **Create and manage API Tokens** — secret `ds_*` tokens for server-side use.
@@ -79,7 +79,7 @@ new ArweaveBundlerStorageAdapter({
 
 If you need to call the managed service directly from browser JavaScript, don't use a `ds_*` token — use a JWT token instead, see [What is a JWT token and why does the service support it?](#what-is-a-jwt-token-and-why-does-the-service-support-it) below.
 
-dStorage Pro is live and open to everyone: claim your Pro Pass at [portal.dstorage.pro](https://portal.dstorage.pro) by signing in with Lace, MetaMask, or 1AM, top up your balance, then generate a token from the dashboard. x402 funding is planned as well. Follow [@dStorageTech on X](https://x.com/dStorageTech) for updates.
+dStorage Pro is live and open to everyone: claim your Pro Pass at [portal.dstorage.pro](https://portal.dstorage.pro) by signing in with Google, Lace, MetaMask, or 1AM, top up your balance, then generate a token from the dashboard. x402 funding is planned as well. Follow [@dStorageTech on X](https://x.com/dStorageTech) for updates.
 
 ### How do I set the credentials via environment variables?
 

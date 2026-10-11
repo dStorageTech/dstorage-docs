@@ -12,7 +12,7 @@ Only a cryptographic hash of the content and the request metadata needed to cons
 
 ### What is the dStorage Pro portal?
 
-The dStorage Pro portal (`https://portal.dstorage.pro`) is the web dashboard where customers manage the account behind the managed payment service — it's the human-facing counterpart to the `signingServerUrl`/`authToken` API the SDK talks to. Log in with Google, Lace, MetaMask (SIWE), or the 1AM wallet extension and a customer account lets you:
+The dStorage Pro portal (`https://portal.dstorage.pro`) is the web dashboard where customers manage the account behind the managed payment service — it's the human-facing counterpart to the `managedPayment` config (`signingServerUrl` + `authToken`) the SDK talks to. Log in with Google, Lace, MetaMask (SIWE), or the 1AM wallet extension and a customer account lets you:
 
 - **Fund a balance** via the Liquidity Manager, using a card, bank transfer, local payment methods, or a coupon — this prepaid balance is what the managed service deducts from on every signed transaction. Some free DUST is also credited to customers for Midnight fee sponsorship. [x402](#will-dstorage-pro-support-funding-accounts-via-x402) support for funding is planned.
 - **Create and manage API Tokens** — secret `ds_*` tokens for server-side use.
@@ -25,7 +25,7 @@ Yes — x402 support is planned as an additional way to fund a dStorage Pro acco
 
 ### How do I configure the managed payment flow?
 
-Pass `signingServerUrl` and `authToken` to any adapter that supports managed signing — on the storage side, `ArweaveStorageAdapter` and `ArweaveBundlerStorageAdapter`; on the chain side, `MidnightChainAdapter`:
+Pass a `managedPayment` object — `{ signingServerUrl, authToken }` — to any adapter that supports managed signing. On the storage side that's `ArweaveStorageAdapter`, `ArweaveBundlerStorageAdapter`, and `ArweaveLocalStorageAdapter`; on the chain side, `MidnightChainAdapter`. The Mock and Simulator adapters accept it too, for testing (see [How do I test the managed payment code path without spending real funds?](#how-do-i-test-the-managed-payment-code-path-without-spending-real-funds)).
 
 ```typescript
 import {
@@ -34,20 +34,18 @@ import {
   MidnightChainAdapter,
 } from "@dstorage-tech/dstorage-sdk";
 
+const managedPayment = {
+  signingServerUrl:
+    process.env.DSTORAGE_SERVICE_URL ?? "https://portal.dstorage.pro",
+  authToken: process.env.DSTORAGE_AUTH_TOKEN ?? "",
+};
+
 const sdk = new DStorage({
-  storageAdapters: [
-    new ArweaveBundlerStorageAdapter({
-      signingServerUrl:
-        process.env.DSTORAGE_SERVICE_URL ?? "https://portal.dstorage.pro",
-      authToken: process.env.DSTORAGE_AUTH_TOKEN ?? "",
-    }),
-  ],
+  storageAdapters: [new ArweaveBundlerStorageAdapter({ managedPayment })],
   chainAdapters: [
     new MidnightChainAdapter({
       // … chain config …
-      signingServerUrl:
-        process.env.DSTORAGE_SERVICE_URL ?? "https://portal.dstorage.pro",
-      authToken: process.env.DSTORAGE_AUTH_TOKEN ?? "",
+      managedPayment,
     }),
   ],
   encryptionAdapters: [
@@ -56,7 +54,7 @@ const sdk = new DStorage({
 });
 ```
 
-Both the storage adapter and the chain adapter accept `signingServerUrl` / `authToken`. Prefer environment variables over hard-coding credentials.
+The same `managedPayment` object can be shared by the storage and chain adapters. It also accepts an optional `requestTimeoutMs` (default 30 s, `0` disables it). Prefer environment variables over hard-coding credentials.
 
 ### Where do I get an auth token?
 
@@ -70,8 +68,10 @@ ds_<credential>.<base64url_modulus>
 
 ```typescript
 new ArweaveBundlerStorageAdapter({
-  signingServerUrl: "https://portal.dstorage.pro",
-  authToken: process.env.DSTORAGE_AUTH_TOKEN ?? "",
+  managedPayment: {
+    signingServerUrl: "https://portal.dstorage.pro",
+    authToken: process.env.DSTORAGE_AUTH_TOKEN ?? "",
+  },
 });
 ```
 
@@ -92,7 +92,7 @@ Or add them to a `.env` file in your project root (loaded via `dotenv` or equiva
 
 ### What does the managed Midnight chain payment flow look like?
 
-DUST chain fees are sponsored by the managed service too — not just Arweave storage. When `MidnightChainAdapter` is configured with `signingServerUrl` and `authToken`, the SDK wraps the wallet's transaction-balancing step so the signing server balances *and* signs the transaction on the wallet's behalf. The local wallet only needs to expose its public keys (for the ZK circuit) — it never needs to hold DUST. This is automatic: no configuration beyond `signingServerUrl`/`authToken` on `MidnightChainAdapter` is needed.
+DUST chain fees are sponsored by the managed service too — not just Arweave storage. When `MidnightChainAdapter` is configured with `managedPayment`, the SDK wraps the wallet's transaction-balancing step so the signing server balances *and* signs the transaction on the wallet's behalf. The local wallet only needs to expose its public keys (for the ZK circuit) — it never needs to hold DUST. This is automatic: no configuration beyond `managedPayment` on `MidnightChainAdapter` is needed. See the [Managed Payments on Midnight](/guide/managed-payments-midnight) guide for a walkthrough.
 
 ### Is there a known security limitation with the managed payment response?
 
@@ -101,40 +101,48 @@ The signing server response (`txId`, `signature`) is validated for schema correc
 The signing key substitution attack (where a MITM replaces the server's public key to corrupt the on-chain ownership record) is mitigated: the expected key is embedded in the auth token and pinned at construction time. Each sign-tx request asserts the pinned key; the server rejects any mismatch.
 
 ::: warning Mitigation for the response MAC gap
-Always use `signingServerUrl` with HTTPS and a valid certificate issued to the operator-controlled domain. Never use this adapter over plain HTTP or with self-signed certificates in production. A proper fix (an `HMAC-SHA256` response MAC) is deferred pending a stable signing-server API.
+Always use a `managedPayment.signingServerUrl` with HTTPS and a valid certificate issued to the operator-controlled domain. Never use this adapter over plain HTTP or with self-signed certificates in production. A proper fix (an `HMAC-SHA256` response MAC) is deferred pending a stable signing-server API.
 :::
 
 ### What payment tokens does the managed service handle?
 
-The managed service covers Arweave storage costs billed in AR, and — when `MidnightChainAdapter` is configured with `signingServerUrl`/`authToken` — Midnight chain fees billed in DUST too. In that case the wallet configured in `MidnightChainAdapter` never needs to hold DUST itself.
+The managed service covers Arweave storage costs billed in AR, and — when `MidnightChainAdapter` is configured with `managedPayment` — Midnight chain fees billed in DUST too. In that case the wallet configured in `MidnightChainAdapter` never needs to hold DUST itself.
 
 ### How do I test the managed payment code path without spending real funds?
 
-Today, use `MockStorageAdapter` and either `MockChainAdapter` or `MidnightSimulatorChainAdapter` with `signingServerUrl` and `authToken` set to your dStorage Pro account and token. All three adapters automatically use the `managedmock` payment network, which sends the network identifier `"TEST"` to the server instead of the real network name that a production adapter would send. This exercises the full managed payment request/response round-trip — including auth token pinning and error handling — without touching real funds.
+dStorage Pro has a `TEST` sandbox: requests sent with the `"TEST"` network identifier are recorded as sandbox payments against your real account and token, without spending real funds. This exercises the full managed payment request/response round-trip — including auth token pinning and error handling. There are three ways to use it.
 
-`MockChainAdapter` is the lighter-weight option — an in-memory chain simulation with no real circuit logic. Use `MidnightSimulatorChainAdapter` instead when you also want to exercise the real DataRegistry Compact circuits (ownership checks, ref-id derivation) locally.
+**`ArweaveLocalStorageAdapter` with `testMode: true`** — set `managedPayment.testMode: true` to send each upload's payment to the `TEST` sandbox while the upload itself still goes to your local arlocal instance (the transaction is signed locally with the test wallet so arlocal accepts it). `testMode` is only supported by `ArweaveLocalStorageAdapter` — `ArweaveStorageAdapter` and `ArweaveBundlerStorageAdapter` reject it at construction. The [Managed Payments Service](/guide/managed-payments-service) guide walks through this setup:
 
 ```typescript
+const managedPayment = {
+  signingServerUrl: "https://portal.dstorage.pro",
+  authToken: process.env.DSTORAGE_AUTH_TOKEN ?? "",
+  testMode: true,
+};
+
+const { adapter: storageAdapter } =
+  await ArweaveLocalStorageAdapter.createWithTestWallet({ managedPayment });
+```
+
+**Mock and Simulator adapters** — `MockStorageAdapter`, `MockChainAdapter`, and `MidnightSimulatorChainAdapter` always use the `managedmock` payment network when given `managedPayment`, which sends `"TEST"` to the server instead of a real network name — no `testMode` flag needed. `MockChainAdapter` is the lighter-weight option — an in-memory chain simulation with no real circuit logic. Use `MidnightSimulatorChainAdapter` instead when you also want to exercise the real DataRegistry Compact circuits (ownership checks, ref-id derivation) locally.
+
+```typescript
+const managedPayment = {
+  signingServerUrl: "https://portal.dstorage.pro",
+  authToken: process.env.DSTORAGE_AUTH_TOKEN ?? "",
+};
+
 const sdk = new DStorage({
-  storageAdapters: [
-    new MockStorageAdapter({
-      signingServerUrl: "https://portal.dstorage.pro",
-      authToken: process.env.DSTORAGE_AUTH_TOKEN ?? "",
-    }),
-  ],
-  chainAdapters: [
-    new MidnightSimulatorChainAdapter({
-      signingServerUrl: "https://portal.dstorage.pro",
-      authToken: process.env.DSTORAGE_AUTH_TOKEN ?? "",
-    }),
-  ],
+  storageAdapters: [new MockStorageAdapter({ managedPayment })],
+  chainAdapters: [new MidnightSimulatorChainAdapter({ managedPayment })],
   encryptionAdapters: [
     /* … */
   ],
 });
 ```
 
-dStorage Pro will also offer dedicated **test tokens** to customers, letting the *real* production adapters — `ArweaveStorageAdapter`, `ArweaveBundlerStorageAdapter`, and `MidnightChainAdapter` — run against the managed service without spending real funds, instead of only their mock/simulator counterparts. Once available, using one will be a drop-in swap: pass the issued test token as `authToken` to those adapters exactly as you would a regular `ds_*` or JWT token, no code changes beyond the credential itself.
+**`TEST` tokens on a real Midnight network** — `TEST` tokens are regularly shared on our socials ([X](https://x.com/dStorageTech), [Reddit](https://www.reddit.com/r/dStorage), [LinkedIn](https://www.linkedin.com/company/dstorage-tech)). Once claimed, dStorage Pro sponsors your DUST fees for free, so the real `MidnightChainAdapter` with `managedPayment` runs on Preprod without spending real funds — and your wallet needs no DUST or NIGHT. See the [Managed Payments on Midnight](/guide/managed-payments-midnight) guide.
 
 ### Can I use a `ds_*` token in browser-side JavaScript?
 
@@ -167,12 +175,14 @@ This gives you a credential that is safe to embed in a browser bundle because th
 
 Create a JWT token in the portal (JWT Tokens tab) or via `POST /api/jwt-tokens` using a `ds_*` token. Required fields: `name`, `expiresAt`, `maxBalance`. The `origin` and `maxRequests` constraints are optional but recommended for public deployments.
 
-Use a JWT token in the SDK exactly the same way as a `ds_*` token — the `authToken` field accepts either format:
+Use a JWT token in the SDK exactly the same way as a `ds_*` token — `managedPayment.authToken` accepts either format:
 
 ```typescript
 new ArweaveBundlerStorageAdapter({
-  signingServerUrl: "https://portal.dstorage.pro",
-  authToken: process.env.DSTORAGE_JWT_TOKEN ?? "",
+  managedPayment: {
+    signingServerUrl: "https://portal.dstorage.pro",
+    authToken: process.env.DSTORAGE_JWT_TOKEN ?? "",
+  },
 });
 ```
 

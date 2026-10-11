@@ -206,7 +206,7 @@ await sdk.rotateKeys(refId);
 
 ### How do I list all my on-chain references?
 
-Call `sdk.listReferences()`. It returns a `ListedDataReference[]` — one entry per reference in the DataRegistry contract — containing the `refId`, decrypted `storageId`, `storageProvider`, `writtenAt`, and any attached metadata. The SDK automatically decrypts each entry using the configured adapters; references whose envelope cannot be decrypted are returned with a `decryptionError` field rather than throwing.
+Call `sdk.listReferences()`. It returns a `ListedDataReference[]` — one entry per reference in the DataRegistry contract — containing the `refId`, decrypted `storageId`, `storageProvider`, `encryptionScheme`, `ownerCommitment`, and any attached (decrypted) `metadata`. The SDK automatically decrypts each entry using the configured adapters; references whose envelope cannot be decrypted are returned with a `decryptionError` field rather than throwing.
 
 The no-filter (aggregate) path queries every configured chain adapter instead of stopping at the first success, so results may span multiple chains. Each returned reference is tagged with `sourceAdapterIndex`, the zero-based index into `chainAdapters` it came from — useful since `ChainAdapter.name`/`.providerName` isn't guaranteed unique per instance.
 

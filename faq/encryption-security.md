@@ -56,7 +56,7 @@ A helper that produces a cryptographically random 43-character base64url string 
 
 ### What makes a password acceptable to `PasswordEncryptionAdapter`?
 
-The adapter enforces four rules at construction time:
+The adapter enforces five rules at construction time:
 
 1. **Length** — at least 12 characters (configurable via `minPasswordLength`).
 2. **Character diversity** — at least 3 of 4 character classes: uppercase, lowercase, digits, special characters.

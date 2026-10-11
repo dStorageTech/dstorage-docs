@@ -35,7 +35,7 @@ const sdk = new DStorage({
 
 ### `MockStorageAdapter`
 
-In-memory storage for development and testing. Stores encrypted bytes in an in-memory `Map` on Node.js or `localStorage` in the browser. No network, no tokens, no Docker required. Generates 43-character base64url `storageId` values in the same format as real Arweave IDs, so code that handles `storageId` values works identically against real and mock storage. Uses a MOCK pricing model for `estimateCost()` calls. Optionally accepts `signingServerUrl` and `authToken` to exercise managed payment request/response round-trips in tests without touching real funds.
+In-memory storage for development and testing. Stores encrypted bytes in an in-memory `Map` on Node.js or `localStorage` in the browser. No network, no tokens, no Docker required. Generates 43-character base64url `storageId` values in the same format as real Arweave IDs, so code that handles `storageId` values works identically against real and mock storage. Uses a MOCK pricing model for `estimateCost()` calls. Optionally accepts a `managedPayment` config (`{ signingServerUrl, authToken }`) to exercise managed payment request/response round-trips in tests without touching real funds.
 
 ```typescript
 const sdk = new DStorage({
@@ -87,7 +87,7 @@ const sdk = new DStorage({
 });
 ```
 
-Requires a funded AR wallet by default (local signing via `walletKey`). To avoid requiring end-users to hold AR, pass `signingServerUrl`/`authToken` instead to delegate signing to a managed service (see [What is dStorage Pro?](./managed-payments#what-is-dstorage-pro) in the Managed Payments section) — the same mechanism `ArweaveBundlerStorageAdapter` requires unconditionally (it has no local-signing mode; omitting `signingServerUrl` throws). The Bundler adapter's advantage isn't avoiding a wallet — both need a managed signing service to do that — it's near-instant ANS-104 finality instead of the 2–20 minute L1 confirmation wait.
+Requires a funded AR wallet by default (local signing via `walletKey`). To avoid requiring end-users to hold AR, pass a `managedPayment` config (`{ signingServerUrl, authToken }`) instead to delegate signing to a managed service (see [What is dStorage Pro?](./managed-payments#what-is-dstorage-pro) in the Managed Payments section) — the same mechanism `ArweaveBundlerStorageAdapter` requires unconditionally (it has no local-signing mode; omitting `managedPayment` throws). The Bundler adapter's advantage isn't avoiding a wallet — both need a managed signing service to do that — it's near-instant ANS-104 finality instead of the 2–20 minute L1 confirmation wait.
 
 `retrieve()` — the method that downloads previously stored content back from Arweave — is bounded by the `maxRetrieveSizeBytes` constructor option (default 256 MiB): the adapter rejects the download upfront if the transaction metadata reports a larger `data_size`, and rejects again after loading if the actual byte count exceeds the limit anyway. This guards against a gateway serving a misleadingly small `data_size` or an unexpectedly huge blob.
 
@@ -99,9 +99,11 @@ Fast finality via managed signing. Uploads via the ANS-104 Arweave bundler, whic
 const sdk = new DStorage({
   storageAdapters: [
     new ArweaveBundlerStorageAdapter({
-      signingServerUrl:
-        process.env.DSTORAGE_SERVICE_URL ?? "https://portal.dstorage.pro",
-      authToken: process.env.DSTORAGE_AUTH_TOKEN ?? "",
+      managedPayment: {
+        signingServerUrl:
+          process.env.DSTORAGE_SERVICE_URL ?? "https://portal.dstorage.pro",
+        authToken: process.env.DSTORAGE_AUTH_TOKEN ?? "",
+      },
     }),
   ],
   // …
@@ -114,7 +116,7 @@ The `authToken` uses the compound `ds_<credential>.<base64url_modulus>` format. 
 
 ### `MockChainAdapter`
 
-In-memory chain adapter for development and testing. Stores on-chain references in an in-memory `Map` on Node.js or in `localStorage` in the browser (browser state survives page reloads). Enforces the same SHA-256 `ownerSecret` commitment check as the real DataRegistry contract, so ownership-gated operations (`removeReference`, `updateReference`) behave correctly in tests. `refId` values are UUID-style strings rather than the Bytes<32> format produced by the real circuit. Requires no Midnight node, proof server, indexer, or DUST tokens. Optionally accepts `signingServerUrl` and `authToken` to exercise managed payment request/response round-trips in tests without touching real funds.
+In-memory chain adapter for development and testing. Stores on-chain references in an in-memory `Map` on Node.js or in `localStorage` in the browser (browser state survives page reloads). Enforces the same SHA-256 `ownerSecret` commitment check as the real DataRegistry contract, so ownership-gated operations (`removeReference`, `updateReference`) behave correctly in tests. `refId` values are UUID-style strings rather than the Bytes<32> format produced by the real circuit. Requires no Midnight node, proof server, indexer, or DUST tokens. Optionally accepts a `managedPayment` config to exercise managed payment request/response round-trips in tests without touching real funds.
 
 ```typescript
 const sdk = new DStorage({
@@ -180,7 +182,7 @@ Typical use cases:
 
 ### `MidnightSimulatorChainAdapter`
 
-Real DataRegistry circuits without a live network. Runs the actual DataRegistry Compact circuits in-process via `DataRegistrySimulator`. Ownership enforcement, `ownerSecret`/`ownerCommitment` semantics, and `refId` derivation all match the on-chain behavior exactly — unlike `MockChainAdapter`, which uses simplified UUID-style IDs. No Midnight node, indexer, proof server, or DUST tokens are required. Optionally accepts `signingServerUrl` and `authToken` to exercise the managed payment flow end-to-end in tests.
+Real DataRegistry circuits without a live network. Runs the actual DataRegistry Compact circuits in-process via `DataRegistrySimulator`. Ownership enforcement, `ownerSecret`/`ownerCommitment` semantics, and `refId` derivation all match the on-chain behavior exactly — unlike `MockChainAdapter`, which uses simplified UUID-style IDs. No Midnight node, indexer, proof server, or DUST tokens are required. Optionally accepts a `managedPayment` config to exercise the managed payment flow end-to-end in tests.
 
 Use this adapter when you need realistic ZK circuit behavior (correct `refId` format, real commitment checks) in integration tests without standing up Docker infrastructure.
 
@@ -194,10 +196,10 @@ const sdk = new DStorage({
 
 ### `MidnightChainAdapter`
 
-Real Midnight network. Connects to the Midnight blockchain — `preprod`, `preview`, and `undeployed`/localhost have built-in default endpoints; any other network (e.g. `mainnet`) also works as long as you supply `nodeEndpoint`, `nodeWsEndpoint`, `indexerEndpoint`, `indexerWsEndpoint`, and `proofServerEndpoint` explicitly. Choose a `walletMode` based on your runtime:
+Real Midnight network. Connects to the Midnight blockchain named by the required `network` field (e.g. `preprod`, `preview`, `undeployed`). The adapter has no built-in default endpoints — which ones you must supply depends on the `walletMode` you choose for your runtime:
 
-- **`"provider"` (Node.js)**: you build and sync a `WalletFacade` yourself, then pass it as `walletProvider`. Also requires `privateStatePassword` (LevelDB encryption) and optionally `zkArtifactsPath` (absolute path to the `keys/` and `zkir/` directories).
-- **`"connector"` (browser)**: delegates all key management to a Midnight wallet extension — by default the first wallet discovered under `window.midnight`, or pass `connectorName` (e.g. `"1am"`) to prefer a specific one (matched by rdns, then declared name, then the injected key). Lace, 1AM, or any other wallet implementing the dApp Connector API works. Requires `zkConfigBaseUrl` set to the base URL from which the ZK artifacts are served.
+- **`"provider"` (Node.js)**: you build and sync a `WalletFacade` yourself, then pass it as `walletProvider`. Also requires `privateStatePassword` (LevelDB encryption), `indexerEndpoint`, `indexerWsEndpoint`, and `proofServerEndpoint` — the constructor throws if any is missing — and optionally `zkArtifactsPath` (absolute path to the `keys/` and `zkir/` directories).
+- **`"connector"` (browser)**: delegates all key management to a Midnight wallet extension — by default the first wallet discovered under `window.midnight`, or pass `connectorName` (e.g. `"1am"`) to prefer a specific one (matched by rdns, then declared name, then the injected key). Lace, 1AM, or any other wallet implementing the dApp Connector API works. Requires `zkConfigBaseUrl` set to the base URL from which the ZK artifacts are served. The indexer endpoints default to the ones the connected wallet reports (set `indexerEndpoint`/`indexerWsEndpoint` to override them). Set `proofServerEndpoint` too: the wallet's own proof server is only used if you opt in with `allowWalletProofServer: true` — do that only for a wallet extension you trust, since a compromised one could redirect ZK witness inputs (including the `ownerSecret`) to an attacker-controlled server.
 
 `init()` either deploys a fresh DataRegistry contract or, if you pass `contractAddress`, reconnects to an existing one. Save the returned address across runs to avoid redeploying.
 
@@ -219,6 +221,8 @@ new MidnightChainAdapter({
   privateStatePassword,
   zkArtifactsPath,
   network: "undeployed",
+  indexerEndpoint: process.env.MIDNIGHT_INDEXER_URL!, // indexer GraphQL (HTTP) URL
+  indexerWsEndpoint: process.env.MIDNIGHT_INDEXER_WS_URL!, // indexer GraphQL WebSocket URL
   proofServerEndpoint: "http://localhost:6300",
 });
 
@@ -232,19 +236,19 @@ new MidnightChainAdapter({
 });
 ```
 
-Requires a running Midnight proof server and a wallet funded with DUST. DUST chain fees are handled internally by the connected wallet — no explicit payment config is needed. Optionally pass `signingServerUrl` and `authToken` to route Midnight transaction balancing through [dStorage Pro](./managed-payments#what-is-dstorage-pro) instead of the local wallet.
+Requires a running Midnight proof server and a wallet funded with DUST. DUST chain fees are handled internally by the connected wallet — no explicit payment config is needed. Optionally pass a `managedPayment` config (`{ signingServerUrl, authToken }`) to route Midnight transaction balancing through [dStorage Pro](./managed-payments#what-is-dstorage-pro) instead of the local wallet — the wallet then needs no DUST or NIGHT (see [Managed Payments on Midnight](/guide/managed-payments-midnight)).
 
 Start a local proof server with Docker (see [How do I start the local Midnight proof server?](./deployment-configuration#how-do-i-start-the-local-midnight-proof-server) in the Deployment section):
 
 ```sh
-docker run -p 6300:6300 midnightntwrk/proof-server:8.0.3 -- midnight-proof-server -v
+docker run -p 6300:6300 midnightntwrk/proof-server:8.1.0 -- midnight-proof-server -v
 ```
 
 ### `PasswordEncryptionAdapter`
 
 Password-derived encryption. Derives a 64-byte KEK from a user-supplied password using scrypt (memory-hard; default: 128 MB RAM per attempt, matching OWASP 2024 recommendations). Because derivation is deterministic, the same `password` and `salt` always produce the same key on any device — no key backup is needed beyond those two values.
 
-The `salt` is mandatory and must be supplied by the caller. Use an app-scoped domain label (`"myapp:v1"`), a per-user identifier, or a combination. The SDK never supplies a default to avoid silent cross-app key collisions when passwords are reused. Passwords are validated at construction: minimum 12 characters, at least 3 of 4 character classes (uppercase, lowercase, digits, special), no sequential runs, and at least 60 bits of estimated entropy.
+The `salt` is mandatory and must be supplied by the caller. Use an app-scoped domain label (`"myapp:v1"`), a per-user identifier, or a combination. The SDK never supplies a default to avoid silent cross-app key collisions when passwords are reused. Passwords are validated at construction: minimum 12 characters, at least 3 of 4 character classes (uppercase, lowercase, digits, special), no sequential runs, no keyboard-walk patterns (e.g. `qwerty`), and at least 60 bits of estimated entropy.
 
 For constrained devices (e.g. mobile browsers) where 128 MB is too expensive, pass `preset: "v1-lite"` (64 MB). In tests, pass `params: { N: 32768, r: 8, p: 1 }` for fast derivation — that's the fastest params the SDK allows. The SDK enforces a hard floor on any custom `N` (must be ≥ 32768 and a power of two — the OWASP 2024 minimum); anything weaker throws at construction time rather than silently producing a brute-forceable KDF.
 

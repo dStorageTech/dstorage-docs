@@ -25,7 +25,7 @@ features:
     details: Encrypted blobs are stored on decentralised networks (Arweave, others coming soon) — no single party holds a plaintext copy.
   - icon: ⛓️
     title: On-chain coordination
-    details: Cryptographic references can be written on-chain (Mock, MidnightSimulator, or Midnight), giving data owners a verifiable, tamper-proof receipt.
+    details: Cryptographic references can be written on-chain (Mock, MidnightSimulator, Midnight, or a custom HTTP gateway), giving data owners a verifiable, tamper-proof receipt.
   - icon: 🔌
     title: Adapter flexibility
     details: Swap storage, chain, and encryption adapters independently — start with Mock everything and move to real infrastructure without changing application code.

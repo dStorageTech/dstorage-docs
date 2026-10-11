@@ -75,8 +75,8 @@ single storage/chain provider with their data.
 
 [dStorage Pro](https://portal.dstorage.pro) is a managed service that signs Arweave and Midnight
 transactions on your app's behalf, so end-users never need their own AR wallet or a
-DUST-funded Midnight wallet. Configure it via `signingServerUrl`/`authToken` on the storage and
-chain adapters — see the [Managed Payments Service](/guide/managed-payments-service) guide for a complete
+DUST-funded Midnight wallet. Configure it via a `managedPayment` config (`signingServerUrl` + `authToken`) on the storage
+and chain adapters — see the [Managed Payments Service](/guide/managed-payments-service) guide for a complete
 walkthrough. dStorage Pro is live — claim your Pro Pass at [portal.dstorage.pro](https://portal.dstorage.pro) to top up and get your API token.
 
 - Managed Arweave signing — no AR wallet or JWK key file needed client-side.
@@ -85,7 +85,7 @@ walkthrough. dStorage Pro is live — claim your Pro Pass at [portal.dstorage.pr
 - Privacy-preserving signing — your file bytes never leave the client and are never sent to or seen by the signing server. Only a cryptographic hash of the content, plus the metadata needed to construct the transaction, is transmitted; the content itself and your encryption keys are never shared with dStorage Pro.
 - Two token types: `ds_*` secret tokens (full account access, server-side only) and scoped JWT tokens (browser-safe, with origin/spend/request caps and instant revocation).
 - Signing-key pinning — the auth token embeds the server's public key, so a key rotation or substitution is detected immediately.
-- A `managedmock` test mode for exercising the full managed-payment round trip without spending real funds — it still uses your real dStorage Pro account and token.
+- A `TEST` sandbox for exercising the full managed-payment round trip without spending real funds — via `managedPayment.testMode: true` on `ArweaveLocalStorageAdapter`, or automatically with the Mock and Simulator adapters — still using your real dStorage Pro account and token.
 - Balance funding via card, bank transfer, local payment methods, or by redeeming a coupon code — with a DUST bonus auto-credited on deposit.
 - A per-account stats dashboard — total requests, success rate, balance spent, and network breakdown, with a 7-day request-activity chart and an all-time network-distribution chart.
 - Unified transaction and payment history — a paginated, filterable feed with a per-transaction breakdown of native network cost vs. service fee, plus live on-chain status tracking (submitted → confirming → confirmed/expired) for non-Midnight transactions.

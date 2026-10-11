@@ -56,7 +56,7 @@ Yes. Files larger than 10 MB are automatically split into independently encrypte
 | Area    | Available now                                                  | Stub / planned |
 | ------- | ---------------------------------------------------------------| -------------- |
 | Storage | Mock, Arweave Local, Arweave, Arweave Bundler (managed)        |
-| Chain   | Mock, MidnightSimulator, Midnight (connector + provider modes) |
+| Chain   | Mock, MidnightSimulator, Midnight (connector + provider modes), HTTP Gateway (custom REST backend) |
 | Payment | Mock, Arweave (JWK), Managed (remote signing server)           |
 
 ### What tokens are used for payments?
@@ -64,7 +64,7 @@ Yes. Files larger than 10 MB are automatically split into independently encrypte
 | Token  | Network  | Used for                                                     |
 | ------ | -------- | -------------------------------------------------------------|
 | `AR`   | Arweave  | Storage payment via `ArweavePaymentAdapter` or managed flow  |
-| `DUST` | Midnight | Chain fees — handled internally by the Midnight wallet       |
+| `DUST` | Midnight | Chain fees — paid by the Midnight wallet, or sponsored via dStorage Pro's managed flow |
 | `MOCK` | Mock     | Development & testing (simulated, no real funds needed)      |
 
 ### What does `isPublic: true` do?

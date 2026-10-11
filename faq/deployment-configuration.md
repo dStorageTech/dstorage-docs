@@ -12,7 +12,7 @@ The `DataRegistry` contract ships pre-compiled with the SDK package (compiled ci
 ### How do I start the local Midnight proof server?
 
 ```sh
-docker run -p 6300:6300 midnightntwrk/proof-server:8.0.3 -- midnight-proof-server -v
+docker run -p 6300:6300 midnightntwrk/proof-server:8.1.0 -- midnight-proof-server -v
 ```
 
 ### How do I start a local Arweave node for testing?
@@ -26,7 +26,10 @@ No real AR tokens are needed — arlocal auto-funds test wallets.
 
 ### What Midnight networks does the adapter support?
 
-Out of the box, with built-in default endpoints, `undeployed` (localhost), `preprod`, and `preview`. Any other network works too — pass its name as `network` and explicitly supply `nodeEndpoint`, `nodeWsEndpoint`, `indexerEndpoint`, `indexerWsEndpoint`, and `proofServerEndpoint`; the adapter only rejects a network name if defaults are missing and any of those endpoints are left unset.
+Any Midnight network — `undeployed` (localhost), `preprod`, `preview`, or another — passed as the required `network` field. The adapter has no built-in default endpoints:
+
+- **Provider mode** requires `indexerEndpoint`, `indexerWsEndpoint`, and `proofServerEndpoint`; the constructor throws if any is missing.
+- **Connector mode** uses the indexer endpoints reported by the connected wallet unless you set `indexerEndpoint`/`indexerWsEndpoint` yourself, and `init()` throws if the wallet is on a different network than `network`. Set `proofServerEndpoint` as well — the wallet's own proof server is only used if you opt in with `allowWalletProofServer: true`.
 
 ### How do I configure `MidnightChainAdapter` for browser vs Node.js?
 
@@ -39,6 +42,10 @@ Node.js (provider mode) — caller supplies a pre-built, synced WalletFacade:
   walletMode: "provider",
   walletProvider,       // AdapterWalletProvider built and synced by the app
   privateStatePassword, // password for local LevelDB state encryption
+  network: "undeployed",
+  indexerEndpoint,      // required: indexer GraphQL (HTTP) URL
+  indexerWsEndpoint,    // required: indexer GraphQL WebSocket URL
+  proofServerEndpoint: "http://localhost:6300", // required
   zkArtifactsPath,      // optional: absolute path to keys/ and zkir/ dirs — the SDK
                          // ships its own compiled copy (see below), no separate compile needed
 }
@@ -51,10 +58,13 @@ Browser (connector mode) — delegates to a wallet extension (1AM, Lace, or anot
   walletMode: "connector",
   connectorName: "1am",              // wallet to prefer under window.midnight
   zkConfigBaseUrl: window.location.origin, // base URL serving keys/ and zkir/
+  network: "preprod",                // must match the network the wallet is set to
+  proofServerEndpoint: "http://localhost:6300",
+  // indexer endpoints come from the wallet unless set here
 }
 ```
 
-`walletMode` is required.
+`walletMode` and `network` are required.
 
 ### Does `WebAuthnPrfEncryptionAdapter` work in a Node.js app?
 
@@ -68,11 +78,13 @@ The one part of the adapter that does work in Node is `fromPublicKey()`: it only
 
 ```typescript
 new ArweaveBundlerStorageAdapter({
-  signingServerUrl: "https://portal.dstorage.pro",
-  // Token format: <credential>.<base64url_modulus> — issued by the signing server.
-  // The modulus (512 bytes, base64url) is the server's RSA-4096 public key and is
-  // used to pin the expected signing key at construction time.
-  authToken: process.env.DSTORAGE_AUTH_TOKEN ?? "",
+  managedPayment: {
+    signingServerUrl: "https://portal.dstorage.pro",
+    // Token format: <credential>.<base64url_modulus> — issued by the signing server.
+    // The modulus (512 bytes, base64url) is the server's RSA-4096 public key and is
+    // used to pin the expected signing key at construction time.
+    authToken: process.env.DSTORAGE_AUTH_TOKEN ?? "",
+  },
 });
 ```
 
@@ -82,7 +94,7 @@ Pass the previously deployed address:
 
 ```typescript
 new MidnightChainAdapter({
-  contractAddress: "02abc123…",
+  contractAddress: "a1b2c3…", // 64 lowercase hex chars
   // … rest of config
 });
 ```

@@ -29,7 +29,7 @@ No real AR tokens are needed — arlocal auto-funds test wallets.
 Any Midnight network — `undeployed` (localhost), `preprod`, `preview`, or another — passed as the required `network` field. The adapter has no built-in default endpoints:
 
 - **Provider mode** requires `indexerEndpoint`, `indexerWsEndpoint`, and `proofServerEndpoint`; the constructor throws if any is missing.
-- **Connector mode** uses the indexer endpoints reported by the connected wallet unless you set `indexerEndpoint`/`indexerWsEndpoint` yourself, and `init()` throws if the wallet is on a different network than `network`. Set `proofServerEndpoint` as well — the wallet's own proof server is only used if you opt in with `allowWalletProofServer: true`.
+- **Connector mode** uses the indexer endpoints reported by the connected wallet unless you set `indexerEndpoint`/`indexerWsEndpoint` yourself, and `init()` throws if the wallet is on a different network than `network`. With the default `prover` (`PROVER_MODE.PROOF_SERVER_URL`), `proofServerEndpoint` is required too; the wallet prover modes use the wallet's proof server or the wallet itself instead (see [Where are ZK proofs generated in connector mode?](/faq/adapters#where-are-zk-proofs-generated-in-connector-mode)).
 
 ### How do I configure `MidnightChainAdapter` for browser vs Node.js?
 
@@ -59,7 +59,7 @@ Browser (connector mode) — delegates to a wallet extension (1AM, Lace, or anot
   connectorName: "1am",              // wallet to prefer under window.midnight
   zkConfigBaseUrl: window.location.origin, // base URL serving keys/ and zkir/
   network: "preprod",                // must match the network the wallet is set to
-  proofServerEndpoint: "http://localhost:6300",
+  proofServerEndpoint: "http://localhost:6300", // required with the default prover
   // indexer endpoints come from the wallet unless set here
 }
 ```

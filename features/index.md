@@ -52,6 +52,7 @@ environment without changing your application code.
 - `MidnightSimulatorChainAdapter` — real DataRegistry circuit behavior without a live network. See [Local & Simulator Adapters](/guide/local-simulator-adapters).
 - `ArweaveLocalStorageAdapter` with an auto-funded test wallet for local integration testing.
 - Production storage adapters — `ArweaveBundlerStorageAdapter` (near-instant finality via the ANS-104 bundler protocol) and `ArweaveStorageAdapter` (direct Arweave L1 submission) — plus `MidnightChainAdapter` for the real Midnight network.
+- Choice of where ZK proofs are generated in the browser — your own proof server, the wallet's configured proof server, or the wallet itself — via `MidnightChainAdapter`'s `prover` option. See [FAQ: Adapters](/faq/adapters#where-are-zk-proofs-generated-in-connector-mode).
 - `HttpGatewayChainAdapter` for delegating chain operations to any custom REST/gateway backend instead of talking to a chain directly.
 
 ## End-User Features

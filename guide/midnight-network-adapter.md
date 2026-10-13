@@ -40,6 +40,14 @@ in the background. If it's running attached to your terminal (as shown above), p
 docker stop $(docker ps -q --filter ancestor=midnightntwrk/proof-server:8.1.0)
 ```
 
+::: tip Proving without your own proof server
+This guide runs its own proof server, which `MidnightChainAdapter` uses by default. In the
+browser you can instead set `prover` to have the wallet's proof server or the wallet itself
+generate the proofs — see
+[Where are ZK proofs generated in connector mode?](/faq/adapters#where-are-zk-proofs-generated-in-connector-mode).
+Use those modes only with a wallet extension you trust.
+:::
+
 ## Step 2 — Configure the SDK
 
 `MidnightChainAdapter` takes a `walletMode`, which depends on where your code runs:
@@ -82,7 +90,7 @@ const chainAdapter = new MidnightChainAdapter({
   connectorName: "1am", // matches window.midnight['1am'] by injected key or wallet name — omit to use whichever wallet is found first
   zkConfigBaseUrl: window.location.origin, // serves the keys/ and zkir/ you copied to public/
   network: "preprod", // matches the Preprod Faucet used to fund your wallet
-  proofServerEndpoint: "http://localhost:6300",
+  proofServerEndpoint: "http://localhost:6300", // required with the default prover
 });
 
 const sdk = new DStorage({

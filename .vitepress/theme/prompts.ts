@@ -12,6 +12,11 @@ const TOKEN_HANDLING = `Don't hard-code my dStorage Pro token: read it from an e
 
 const LOCAL_SERVICES = `Before running anything, check whether the local services the guide needs are already running and tell me which ones you need me to start.`;
 
+// Points the agent at a guide's Markdown copy, with fallbacks: some agents' fetch tools reject
+// the text/markdown content type the .md copies are served with.
+const guide = (title: string, slug: string) =>
+  `"${title}" guide at ${DOCS_URL}/guide/${slug}.md (if that URL can't be fetched, use the HTML page at ${DOCS_URL}/guide/${slug}.html or the full docs in ${DOCS_URL}/llms-full.txt instead)`;
+
 export interface AgentPromptEntry {
   // Heading shown in the prompt box; defaults to "Let your AI agent follow this guide".
   label?: string;
@@ -22,7 +27,7 @@ export const prompts: Record<string, AgentPromptEntry> = {
   "mock-adapters": {
     prompt: `${SOURCE_OF_TRUTH}
 
-Read the "Mock Adapters" guide at ${DOCS_URL}/guide/mock-adapters.md, then follow it in my current project:
+Read the ${guide("Mock Adapters", "mock-adapters")}, then follow it in my current project:
 
 1. Install @dstorage-tech/dstorage-sdk (requires Node.js 22 or later).
 2. Configure DStorage with MockStorageAdapter, MockChainAdapter and PasswordEncryptionAdapter, exactly as the guide shows.
@@ -36,7 +41,7 @@ ${CONFLICTS}`,
     label: "Let your AI agent explain this with your code",
     prompt: `${SOURCE_OF_TRUTH}
 
-Read the "Core Concepts" guide at ${DOCS_URL}/guide/core-concepts.md, then look at how my current project uses the dStorage SDK and explain, in terms of my own code:
+Read the ${guide("Core Concepts", "core-concepts")}, then look at how my current project uses the dStorage SDK and explain, in terms of my own code:
 
 1. Which encryptionAdapters protect each upload's DEK, and which of them could unlock my data on their own.
 2. Where my code gets a refId and where it gets a storageId, and whether I'm storing the right one for later retrieval.
@@ -49,7 +54,7 @@ Point to file and line for each answer. Don't change any code; if something look
   "local-simulator-adapters": {
     prompt: `${SOURCE_OF_TRUTH}
 
-Read the "Local & Simulator Adapters" guide at ${DOCS_URL}/guide/local-simulator-adapters.md, then follow it in my current project:
+Read the ${guide("Local & Simulator Adapters", "local-simulator-adapters")}, then follow it in my current project:
 
 1. Make sure arlocal is running on port 1984 (Docker or npx, as the guide shows).
 2. Replace MockStorageAdapter with ArweaveLocalStorageAdapter.createWithTestWallet() and MockChainAdapter with MidnightSimulatorChainAdapter. Keep PasswordEncryptionAdapter as it is.
@@ -62,7 +67,7 @@ ${LOCAL_SERVICES} ${CONFLICTS}`,
   "managed-payments-service": {
     prompt: `${SOURCE_OF_TRUTH}
 
-Read the "Managed Payments Service" guide at ${DOCS_URL}/guide/managed-payments-service.md, then follow it in my current project, starting from the Local & Simulator Adapters setup:
+Read the ${guide("Managed Payments Service", "managed-payments-service")}, then follow it in my current project, starting from the Local & Simulator Adapters setup:
 
 1. Make sure arlocal is running on port 1984.
 2. Create a single managedPayment config object (signingServerUrl "https://portal.dstorage.pro", testMode: true) and pass it to both ArweaveLocalStorageAdapter.createWithTestWallet() and MidnightSimulatorChainAdapter.
@@ -75,7 +80,7 @@ ${TOKEN_HANDLING} ${LOCAL_SERVICES} ${CONFLICTS}`,
   "midnight-network-adapter": {
     prompt: `${SOURCE_OF_TRUTH}
 
-Read the "Midnight Network Adapter" guide at ${DOCS_URL}/guide/midnight-network-adapter.md, then follow it in my current project. This guide runs in the browser with Vite:
+Read the ${guide("Midnight Network Adapter", "midnight-network-adapter")}, then follow it in my current project. This guide runs in the browser with Vite:
 
 1. Make sure arlocal is running on port 1984, and start the Midnight proof server Docker image on port 6300 with the exact image tag the guide uses.
 2. Copy the SDK's DataRegistry keys/ and zkir/ folders into public/, as the guide shows, and add a script so this happens on every dev run.
@@ -89,7 +94,7 @@ You can't drive my wallet extension: when it's time to click Run, tell me what t
   "passkey-encryption": {
     prompt: `${SOURCE_OF_TRUTH}
 
-Read the "Passkey Encryption" guide at ${DOCS_URL}/guide/passkey-encryption.md, then follow it in my current project, starting from the Midnight Network Adapter browser app:
+Read the ${guide("Passkey Encryption", "passkey-encryption")}, then follow it in my current project, starting from the Midnight Network Adapter browser app:
 
 1. Check WebAuthnPrfEncryptionAdapter.isSupported() and show a clear message if PRF isn't available.
 2. Call register() on the first visit and authenticate() on later visits, and persist the credentialId in localStorage as the guide shows.
@@ -102,7 +107,7 @@ You can't complete passkey prompts for me: tell me when to run the app, what bro
   "managed-payments-midnight": {
     prompt: `${SOURCE_OF_TRUTH}
 
-Read the "Managed Payments on Midnight" guide at ${DOCS_URL}/guide/managed-payments-midnight.md, then follow it in my current project, starting from the Midnight Network Adapter browser app:
+Read the ${guide("Managed Payments on Midnight", "managed-payments-midnight")}, then follow it in my current project, starting from the Midnight Network Adapter browser app:
 
 1. Make sure arlocal (port 1984) and the Midnight proof server (port 6300) are running, as in the Midnight Network Adapter guide.
 2. Add a managedPayment config object (signingServerUrl "https://portal.dstorage.pro") to MidnightChainAdapter only. Leave ArweaveLocalStorageAdapter and PasswordEncryptionAdapter unchanged.

@@ -5,7 +5,7 @@ import { useData, useRoute } from "vitepress";
 import Wordmark from "./Wordmark.vue";
 import EarlyAccessBanner from "./EarlyAccessBanner.vue";
 import AgentPrompt from "./AgentPrompt.vue";
-import CopyOrDownloadAsMarkdownButtons from "vitepress-plugin-llms/vitepress-components/CopyOrDownloadAsMarkdownButtons.vue";
+import CopyPageForAi from "./CopyPageForAi.vue";
 import { useSidebarScrollSpy } from "./sidebarScrollSpy";
 import "./custom.css";
 
@@ -22,14 +22,14 @@ const Layout = defineComponent({
         "nav-bar-title-before": () => h(Wordmark),
         "layout-top": () =>
           frontmatter.value.layout === "home" ? null : h(EarlyAccessBanner),
-        // "Copy page for AI" dropdown from vitepress-plugin-llms, moved from under each page's
-        // h1 into the nav bar. It resolves the page URL only on mount, so it's keyed by route
-        // to remount on every navigation.
+        // "Copy page for AI" dropdown (adapted from vitepress-plugin-llms), shown in the nav bar
+        // rather than under each page's h1. It resolves the page URL only on mount, so it's
+        // keyed by route to remount on every navigation.
         "nav-bar-content-before": () =>
           frontmatter.value.layout === "home"
             ? null
             : h("div", { class: "nav-llms-buttons" }, [
-                h(CopyOrDownloadAsMarkdownButtons, { key: route.path }),
+                h(CopyPageForAi, { key: route.path }),
               ]),
       });
   },

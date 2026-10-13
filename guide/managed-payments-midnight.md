@@ -12,6 +12,8 @@ need a wallet funded with DUST or NIGHT. If you'd rather try the managed-payment
 first, see [Managed Payments Service](/guide/managed-payments-service), which runs it against the
 simulator and dStorage Pro's `TEST` sandbox.
 
+<AgentPrompt id="managed-payments-midnight" />
+
 ## Prerequisites
 
 Everything from the [Midnight Network Adapter](/guide/midnight-network-adapter) guide, except

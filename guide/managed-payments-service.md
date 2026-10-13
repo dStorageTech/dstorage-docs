@@ -13,6 +13,8 @@ routes its storage and chain payments through dStorage Pro's `TEST` (sandbox) se
 full managed-payment round trip against your real dStorage Pro account, while uploads still go to
 your local arlocal instance and no real funds are spent.
 
+<AgentPrompt id="managed-payments-service" />
+
 ## Prerequisites
 
 Everything from the [Local & Simulator Adapters](/guide/local-simulator-adapters) guide, plus a

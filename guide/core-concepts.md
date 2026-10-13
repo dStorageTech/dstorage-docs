@@ -4,6 +4,8 @@ The [Mock Adapters](/guide/mock-adapters) guide showed *how* to call the SDK. Th
 *why* it works the way it does — the three ideas worth having in your head before you plug in
 real adapters.
 
+<AgentPrompt id="core-concepts" />
+
 ## How your data gets encrypted
 
 Every upload gets its own random encryption key, called the **DEK** (Data Encryption Key). The

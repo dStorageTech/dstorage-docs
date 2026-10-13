@@ -1,5 +1,6 @@
 import { defineConfig } from "vitepress";
 import type { HeadConfig } from "vitepress";
+import llmstxt from "vitepress-plugin-llms";
 import { buildFaqSidebar } from "./faqSidebar";
 
 const GA_MEASUREMENT_ID = "G-Z4HN3WGRBY";
@@ -11,6 +12,11 @@ export default defineConfig({
   base: "/docs/",
   appearance: "dark",
   srcExclude: ["README.md", "dstorage-sdk/**"],
+
+  // Generates llms.txt, llms-full.txt and a Markdown copy of every page for AI agents.
+  vite: {
+    plugins: [llmstxt({ domain: "https://dstorage.pro" })],
+  },
 
   head: [
     ["link", { rel: "icon", href: "/docs/favicon.ico", sizes: "any" }],
@@ -61,6 +67,15 @@ gtag('config', '${GA_MEASUREMENT_ID}');`,
 
   themeConfig: {
     siteTitle: false,
+
+    // Labels for the per-page "Copy page" dropdown from vitepress-plugin-llms, worded so
+    // it's clear the button is for handing the page to an AI assistant.
+    llms: {
+      copyText: "Copy page for AI",
+      copiedText: "Copied for AI",
+      viewMarkdownText: "View as Markdown",
+      openInAIText: "Ask {provider} about this page",
+    },
     nav: [
       { text: "Guide", link: "/guide/" },
       { text: "Features", link: "/features/" },

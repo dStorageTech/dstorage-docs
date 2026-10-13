@@ -5,6 +5,8 @@ circuits in-process, with no live network. This guide swaps `MidnightSimulatorCh
 the real `MidnightChainAdapter` — connecting to an actual Midnight network with a real wallet
 and a real proof server. It's the first guide in this series that talks to live infrastructure.
 
+<AgentPrompt id="midnight-network-adapter" />
+
 ## Prerequisites
 
 - Node.js 22 or later, to run the Vite dev server (the app code itself runs in the browser)

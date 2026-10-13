@@ -8,6 +8,8 @@ the [Midnight Network Adapter](/guide/midnight-network-adapter) guide's browser 
 platform passkey rather than a typed password. Only the encryption adapter changes here; storage
 and chain setup stay exactly as they were in the Midnight Network Adapter guide.
 
+<AgentPrompt id="passkey-encryption" />
+
 ## Prerequisites
 
 Everything from the [Midnight Network Adapter](/guide/midnight-network-adapter) guide, plus:

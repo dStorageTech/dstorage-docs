@@ -10,6 +10,9 @@ hero:
       text: Start Building
       link: /guide/
     - theme: alt
+      text: Build with AI
+      link: "#build-with-your-ai-agent"
+    - theme: alt
       text: All Features
       link: /features/
     - theme: alt
@@ -38,3 +41,16 @@ features:
     link: https://portal.dstorage.pro
     linkText: Get dStorage Pro
 ---
+
+## Build with your AI agent
+
+These docs are written to be read by AI coding agents as well as people. Point Claude Code,
+Cursor, Codex or any other agent at [`llms.txt`](https://dstorage.pro/docs/llms.txt) (an index
+of every page) or [`llms-full.txt`](https://dstorage.pro/docs/llms-full.txt) (the whole docs in
+one file), so it works from the current SDK API rather than what it remembers.
+
+Every [guide](/guide/) starts with a ready-made prompt that has your agent follow it in your own
+project. Here's the first one: copy it into your agent to get your first encrypted upload and
+retrieval working.
+
+<AgentPrompt id="mock-adapters" label="Get started with your AI agent" />

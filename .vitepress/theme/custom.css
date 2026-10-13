@@ -88,3 +88,43 @@
 div[class*="language-"] {
   border-radius: var(--docs-radius) !important;
 }
+
+/* "Copy page for AI" dropdown in the nav bar (see theme/index.ts): pinned to the left of the
+   nav content, with the plugin's in-page spacing removed and a more compact button. */
+.VPNavBar .nav-llms-buttons {
+  margin-right: auto;
+}
+
+.VPNavBar .nav-llms-buttons .markdown-copy-buttons {
+  width: auto;
+  margin: 0;
+}
+
+.VPNavBar .nav-llms-buttons .markdown-copy-buttons-inner {
+  margin: 0;
+}
+
+.VPNavBar .nav-llms-buttons .dropdown-trigger {
+  font-size: 13px;
+}
+
+.VPNavBar .nav-llms-buttons .copy-page {
+  padding: 5px 12px;
+}
+
+@media (max-width: 767px) {
+  .VPNavBar .nav-llms-buttons .copy-page .label {
+    display: none;
+  }
+
+  /* Keep a hint that the icon-only button is for AI once the full label is hidden. */
+  .VPNavBar .nav-llms-buttons .copy-page::after {
+    content: "AI";
+    font-weight: 600;
+  }
+
+  .VPNavBar .nav-llms-buttons .copy-page {
+    gap: 6px;
+    padding: 5px 10px;
+  }
+}

@@ -10,6 +10,8 @@ This is a good next step once Mock Adapters feels too simplified: `refId` values
 real circuit-derived format, and ownership checks run exactly as they would against the live
 chain — so tests written against these adapters exercise realistic behavior.
 
+<AgentPrompt id="local-simulator-adapters" />
+
 ## Prerequisites
 
 - Node.js 22 or later

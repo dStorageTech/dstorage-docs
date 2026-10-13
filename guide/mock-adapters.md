@@ -5,6 +5,8 @@ using dStorage's in-memory Mock adapters — no Midnight wallet, no Docker, no e
 They're fully self-contained and behave like the real storage/chain adapters, just without the
 network calls.
 
+<AgentPrompt id="mock-adapters" />
+
 ## Prerequisites
 
 - Node.js 22 or later

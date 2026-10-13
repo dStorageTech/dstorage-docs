@@ -128,3 +128,34 @@ div[class*="language-"] {
     padding: 5px 10px;
   }
 }
+
+/* Landing page: the hero's image column holds the agent prompt box (HeroAgentPrompt.vue)
+   instead of an image, so undo VitePress's fixed-size, offset image placement. */
+.VPHero.has-image .image {
+  order: 2;
+  margin: 2rem 0 0;
+}
+
+.VPHero.has-image .image-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  height: auto;
+  transform: none;
+}
+
+.VPHero.has-image .image-bg {
+  display: none;
+}
+
+@media (min-width: 960px) {
+  .VPHero.has-image .image {
+    display: flex;
+    align-items: center;
+    margin: 0 0 0 2rem;
+  }
+
+  .VPHero.has-image .main {
+    width: 55%;
+  }
+}

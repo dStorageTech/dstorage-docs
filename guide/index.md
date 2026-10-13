@@ -9,6 +9,9 @@ Every guide can also be followed hands-on against a ready-to-run starter app ins
 from scratch — clone [`dstorage-starter-template`](https://github.com/dStorageTech/dstorage-starter-template)
 and swap in each guide's adapters as you go.
 
+Working with an AI coding agent? Each guide starts with a ready-made prompt for it — see
+[Build with AI](/guide/build-with-ai) for those and for pointing your agent at these docs.
+
 - **[Mock Adapters](/guide/mock-adapters)** — fully in-memory, zero external dependencies. Your first encrypted upload and retrieval, in a few minutes.
 - **[Core Concepts](/guide/core-concepts)** — how your data gets encrypted, `storageId` vs `refId`, and how the three adapter slots compose. Conceptual, not hands-on — read this before or after Mock Adapters.
 - **[Local & Simulator Adapters](/guide/local-simulator-adapters)** — real circuit behavior and real local storage, still with no live wallet or Docker proof server.

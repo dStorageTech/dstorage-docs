@@ -5,6 +5,7 @@ import { useData, useRoute } from "vitepress";
 import Wordmark from "./Wordmark.vue";
 import EarlyAccessBanner from "./EarlyAccessBanner.vue";
 import AgentPrompt from "./AgentPrompt.vue";
+import HeroAgentPrompt from "./HeroAgentPrompt.vue";
 import CopyPageForAi from "./CopyPageForAi.vue";
 import { useSidebarScrollSpy } from "./sidebarScrollSpy";
 import "./custom.css";
@@ -20,6 +21,8 @@ const Layout = defineComponent({
     return () =>
       h(DefaultTheme.Layout, null, {
         "nav-bar-title-before": () => h(Wordmark),
+        // The landing page shows the first guide's agent prompt beside the hero title.
+        "home-hero-image": () => h(HeroAgentPrompt),
         "layout-top": () =>
           frontmatter.value.layout === "home" ? null : h(EarlyAccessBanner),
         // "Copy page for AI" dropdown (adapted from vitepress-plugin-llms), shown in the nav bar

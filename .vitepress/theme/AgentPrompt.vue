@@ -3,13 +3,19 @@ import { computed, ref } from "vue";
 import { prompts } from "./prompts";
 
 // `label` overrides the prompt entry's heading, e.g. when a guide's prompt is reused elsewhere.
-const props = defineProps<{ id: string; label?: string }>();
+// `compact` drops the "paste it into your agent" hint, for places that explain it already.
+// `open` shows the prompt text expanded initially.
+const props = defineProps<{ id: string; label?: string; compact?: boolean; open?: boolean }>();
 
 const entry = computed(() => {
   const found = prompts[props.id];
   if (!found) throw new Error(`AgentPrompt: unknown prompt id "${props.id}"`);
   return found;
 });
+
+// The prompt text starts collapsed unless `open` is set; the copy and run buttons work either way.
+const expanded = ref(props.open);
+const promptId = computed(() => `agent-prompt-${props.id}`);
 
 const copied = ref(false);
 let resetTimer: ReturnType<typeof setTimeout> | undefined;
@@ -44,12 +50,22 @@ const chatGptUrl = computed(
         <a class="action" :href="chatGptUrl" target="_blank" rel="noopener">Run in ChatGPT</a>
       </div>
     </div>
-    <p class="hint">
+    <p v-if="!compact" class="hint">
       Paste it into Claude Code, Cursor, Codex or any coding agent running in your project. The
       prompt points the agent at these docs, so it works from the current API rather than what it
       remembers.
     </p>
-    <pre class="prompt"><code>{{ entry.prompt }}</code></pre>
+    <button
+      type="button"
+      class="toggle"
+      :aria-expanded="expanded"
+      :aria-controls="promptId"
+      @click="expanded = !expanded"
+    >
+      <span class="chevron" :class="{ open: expanded }" aria-hidden="true">›</span>
+      {{ expanded ? "Hide prompt" : "Show prompt" }}
+    </button>
+    <pre v-show="expanded" :id="promptId" class="prompt"><code>{{ entry.prompt }}</code></pre>
   </div>
 </template>
 
@@ -120,14 +136,45 @@ const chatGptUrl = computed(
 }
 
 .hint {
-  margin: 0.35rem 0 0.5rem;
+  margin: 0.35rem 0 0;
   font-size: 0.82rem;
   line-height: 1.45;
   color: var(--vp-c-text-2);
 }
 
+.toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  width: fit-content;
+  margin: 0.4rem auto 0;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--vp-c-brand-1);
+  font-size: 0.82rem;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.toggle:hover {
+  color: var(--vp-c-brand-2);
+}
+
+.chevron {
+  display: inline-block;
+  width: 0.7em;
+  font-size: 1.1em;
+  line-height: 1;
+  transition: transform 0.2s;
+}
+
+.chevron.open {
+  transform: rotate(90deg);
+}
+
 .prompt {
-  margin: 0;
+  margin: 0.5rem 0 0;
   max-height: 11rem;
   overflow: auto;
   padding: 0.6rem 0.8rem;

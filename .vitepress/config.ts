@@ -88,6 +88,7 @@ gtag('config', '${GA_MEASUREMENT_ID}');`,
           text: "Guide",
           items: [
             { text: "Overview", link: "/guide/" },
+            { text: "Build with AI", link: "/guide/build-with-ai" },
             { text: "Mock Adapters", link: "/guide/mock-adapters" },
             { text: "Core Concepts", link: "/guide/core-concepts" },
             {

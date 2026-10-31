@@ -8,6 +8,10 @@ const SOURCE_OF_TRUTH = `Use the dStorage SDK docs as your source of truth, not 
 
 const CONFLICTS = `If anything in my project conflicts with the guide (module system, Node.js version, existing dStorage setup), explain the conflict before changing anything.`;
 
+// The Node guides' samples use import and top-level await; without this, a fresh `npm init`
+// project runs them only via Node's syntax detection (with a warning) and a CommonJS one fails.
+const ES_MODULE = `The guide's code uses import and top-level await, so run it as an ES module: set "type": "module" in package.json for a new project, or use a .mjs file in an existing CommonJS one.`;
+
 const TOKEN_HANDLING = `Don't hard-code my dStorage Pro token: read it from an environment variable, add a placeholder for it to .env.example, and make sure the real .env file is git-ignored. If the token isn't set, stop and ask me for it.`;
 
 const LOCAL_SERVICES = `Before running anything, check whether the local services the guide needs are already running and tell me which ones you need me to start.`;
@@ -34,7 +38,7 @@ Read the ${guide("Mock Adapters", "mock-adapters")}, then follow it in my curren
 3. Add a small script that calls init(), stores the string "hello, dStorage", retrieves it with retrieveByRefId(), prints the decoded result, and calls destroy().
 4. Run the script and confirm it prints "hello, dStorage".
 
-${CONFLICTS}`,
+${ES_MODULE} ${CONFLICTS}`,
   },
 
   "core-concepts": {
@@ -61,7 +65,7 @@ Read the ${guide("Local & Simulator Adapters", "local-simulator-adapters")}, the
 3. Run the init() / store() / retrieveByRefId() round trip with the string "hello, dStorage" and confirm it prints that string back.
 4. Show me the chainRefId and storageId you got, and confirm that the chainRefId is a 32-byte hex ID.
 
-${LOCAL_SERVICES} ${CONFLICTS}`,
+${LOCAL_SERVICES} ${ES_MODULE} ${CONFLICTS}`,
   },
 
   "managed-payments-service": {
@@ -74,7 +78,7 @@ Read the ${guide("Managed Payments Service", "managed-payments-service")}, then 
 3. Run the init() / store() / retrieveByRefId() round trip with the string "hello, dStorage" and confirm it prints that string back.
 4. Tell me to check the dStorage Pro portal, where this store() should show up as two TEST payments: one for storage and one for the chain.
 
-${TOKEN_HANDLING} ${LOCAL_SERVICES} ${CONFLICTS}`,
+${TOKEN_HANDLING} ${LOCAL_SERVICES} ${ES_MODULE} ${CONFLICTS}`,
   },
 
   "midnight-network-adapter": {

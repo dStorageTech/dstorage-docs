@@ -21,6 +21,7 @@ Everything from the [Local & Simulator Adapters](/guide/local-simulator-adapters
 dStorage Pro token:
 
 - Node.js 22 or later
+- An ES module project: the examples use `import` and top-level `await`. Set `"type": "module"` in `package.json` (`npm pkg set type=module`), or name your script with a `.mjs` extension.
 - [arlocal](https://github.com/textury/arlocal) running locally — see
   [Step 1 of the Local & Simulator Adapters guide](/guide/local-simulator-adapters#step-1-—-start-arlocal)
 - A dStorage Pro account and API token from [portal.dstorage.pro](https://portal.dstorage.pro)

@@ -10,6 +10,7 @@ network calls.
 ## Prerequisites
 
 - Node.js 22 or later
+- An ES module project: the examples use `import` and top-level `await`. Set `"type": "module"` in `package.json` (`npm pkg set type=module`), or name your script with a `.mjs` extension.
 - npm
 
 That's it — Mock adapters need no wallet extensions, no proof server, and no tokens.

@@ -15,6 +15,7 @@ chain — so tests written against these adapters exercise realistic behavior.
 ## Prerequisites
 
 - Node.js 22 or later
+- An ES module project: the examples use `import` and top-level `await`. Set `"type": "module"` in `package.json` (`npm pkg set type=module`), or name your script with a `.mjs` extension.
 - [arlocal](https://github.com/textury/arlocal) — a local Arweave-compatible node
 - No Midnight proof server, wallet extension, or DUST tokens needed —
   `MidnightSimulatorChainAdapter` runs the real `DataRegistry` circuits in-process

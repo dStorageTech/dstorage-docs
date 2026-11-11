@@ -1,3 +1,7 @@
+---
+description: "Run dStorage against a local Arweave node (arlocal) and the in-process Midnight simulator, with real DataRegistry circuits and no wallet or proof server."
+---
+
 # Local & Simulator Adapters
 
 The [Mock Adapters](/guide/mock-adapters) guide used fully in-memory adapters. This guide swaps

@@ -1,3 +1,7 @@
+---
+description: "Encrypt uploads with a platform passkey instead of a password, using WebAuthnPrfEncryptionAdapter and the WebAuthn PRF extension."
+---
+
 # Passkey Encryption (WebAuthn PRF)
 
 This guide uses the [WebAuthn PRF extension](https://developer.mozilla.org/en-US/docs/Web/API/Web_Authentication_API/WebAuthn_extensions) — see MDN's docs if you want the full spec-level detail behind how passkeys generate the key material this guide relies on.

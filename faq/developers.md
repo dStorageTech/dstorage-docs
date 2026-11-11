@@ -1,3 +1,7 @@
+---
+description: "Practical dStorage SDK usage: minimal setup, init() and destroy(), metadata, cost estimates, updating, listing and removing references, key rotation and browser support."
+---
+
 # Developers
 
 ### What is the minimal working setup?

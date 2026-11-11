@@ -1,3 +1,7 @@
+---
+description: "dStorage's encryption design (XChaCha20-Poly1305, DEK/KEK), the encryption adapters available, which secrets the SDK holds, and its security guarantees."
+---
+
 # Encryption & Security
 
 ### Does the SDK keep or hold any secrets, including wallet secrets?

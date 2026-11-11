@@ -1,3 +1,7 @@
+---
+description: "What dStorage is, who it's for, what it stores on-chain vs off-chain, and how the DataRegistry contract and on-chain references work."
+---
+
 # Concepts & Features
 
 ### What is dStorage?

@@ -1,3 +1,7 @@
+---
+description: "The order to read the dStorage guides in, from in-memory mock adapters to a live Midnight network with passkey encryption and managed payments."
+---
+
 # Guide
 
 Six guides that gradually introduce new concepts — each one swaps in a more realistic set of

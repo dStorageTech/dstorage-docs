@@ -1,3 +1,7 @@
+---
+description: "Route Arweave storage and Midnight chain payments through dStorage Pro's TEST sandbox, so users never need a funded wallet, while still running against arlocal and the simulator."
+---
+
 # Managed Payments Service
 
 dStorage Pro is a hosted signing/payment service run by the dStorage team. It covers the network

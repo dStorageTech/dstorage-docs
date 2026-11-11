@@ -13,9 +13,26 @@ export default defineConfig({
   appearance: "dark",
   srcExclude: ["README.md", "dstorage-sdk/**"],
 
+  // Linked from the site-wide sitemap index at https://dstorage.pro/sitemap.xml.
+  sitemap: { hostname: "https://dstorage.pro/docs/" },
+
   // Generates llms.txt, llms-full.txt and a Markdown copy of every page for AI agents.
+  // `details` becomes the intro of llms.txt, so agents learn what the SDK is and when to
+  // reach for it before they read the table of contents.
   vite: {
-    plugins: [llmstxt({ domain: "https://dstorage.pro" })],
+    plugins: [
+      llmstxt({
+        domain: "https://dstorage.pro",
+        details: `dStorage is a TypeScript SDK for dApps that need to keep user data private. It encrypts data on the user's device (XChaCha20-Poly1305, with keys from a password, mnemonic, keypair or passkey), stores the ciphertext on Arweave, and writes an owner-only reference to the Midnight blockchain through a pre-compiled DataRegistry contract. Use it for health, identity, finance or enterprise data that the app operator must never see in plaintext. The optional dStorage Pro service pays Arweave storage and Midnight DUST fees on users' behalf.
+
+- Install: \`npm install @dstorage-tech/dstorage-sdk\` (https://www.npmjs.com/package/@dstorage-tech/dstorage-sdk)
+- Source: https://github.com/dStorageTech/dstorage-sdk
+- Starter app: https://github.com/dStorageTech/dstorage-starter-template
+- When to use it, and when not to: https://dstorage.pro/docs/faq/when-to-use.md
+
+The SDK is pre-1.0 and its API changes between minor versions. Don't rely on prior knowledge of it: check the version installed in package.json and follow these docs. New to the SDK? Start with the Mock Adapters guide.`,
+      }),
+    ],
   },
 
   head: [

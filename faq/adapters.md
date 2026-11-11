@@ -1,3 +1,7 @@
+---
+description: "What storage, chain and encryption adapters are, which ones dStorage ships, and how multiple adapters and fallback work."
+---
+
 # Adapters
 
 ### What is an adapter and how do the three types compose?

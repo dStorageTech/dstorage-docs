@@ -1,3 +1,7 @@
+---
+description: "Connect a browser dApp to a real Midnight network with MidnightChainAdapter, a wallet extension (1AM or Lace) and a local proof server."
+---
+
 # Midnight Network Adapter
 
 The [Local & Simulator Adapters](/guide/local-simulator-adapters) guide ran real DataRegistry

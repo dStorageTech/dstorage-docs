@@ -1,3 +1,7 @@
+---
+description: "Use dStorage on a real Midnight network with DUST fees sponsored by dStorage Pro, so neither you nor your users need a wallet funded with DUST or NIGHT."
+---
+
 # Managed Payments on Midnight
 
 dStorage Pro is a hosted signing/payment service run by the dStorage team. It can front the

@@ -1,3 +1,7 @@
+---
+description: "How dStorage encrypts data (per-upload DEK wrapped by a KEK), the difference between storageId and refId, and how storage, chain and encryption adapters fit together."
+---
+
 # Core Concepts
 
 The [Mock Adapters](/guide/mock-adapters) guide showed *how* to call the SDK. This page explains

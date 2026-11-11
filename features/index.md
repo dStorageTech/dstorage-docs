@@ -1,4 +1,5 @@
 ---
+description: "Everything dStorage offers: developer features of the SDK, privacy guarantees for end users, and what the dStorage Pro managed payments service adds."
 # Every sidebar sub-item on this page (see .vitepress/config.ts) is a hash
 # anchor into this same page, so VitePress's Prev/Next pager — which dedupes
 # sidebar candidates by path, ignoring hash — never has a genuine other page

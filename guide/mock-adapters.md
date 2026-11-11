@@ -1,3 +1,7 @@
+---
+description: "Your first encrypted upload and retrieval with dStorage in a few minutes, using in-memory mock adapters: no wallet, no Docker, no external services."
+---
+
 # Mock Adapters
 
 This guide gets you from zero to your first encrypted upload and retrieval in a few minutes,

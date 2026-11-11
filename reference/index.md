@@ -1,3 +1,7 @@
+---
+description: "dStorage SDK API reference (coming soon); until then, the guides cover the full init(), store() and retrieveByRefId() call pattern."
+---
+
 # Reference
 
 API reference docs are coming soon.

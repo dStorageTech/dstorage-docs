@@ -1,3 +1,7 @@
+---
+description: "Prerequisites and configuration for running dStorage: proof server, arlocal, supported Midnight networks, browser vs Node.js setup, reusing a contract and serving ZK artifacts."
+---
+
 # Deployment & Configuration
 
 ### What are the prerequisites for running the SDK locally?

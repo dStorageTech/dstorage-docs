@@ -1,3 +1,7 @@
+---
+description: "Fixes for common dStorage errors: duplicate bn.js copies, wallet extension not detected, invalid prover config, and proof server or wallet proving failures."
+---
+
 # Troubleshooting
 
 ### `Failed to parse result provided by node` / `instanceof BN` failure

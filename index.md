@@ -1,4 +1,5 @@
 ---
+description: "dStorage SDK: a TypeScript SDK that encrypts data on the user's device, stores it on decentralised storage (Arweave) and records an owner-only reference on the Midnight blockchain."
 layout: home
 
 hero:

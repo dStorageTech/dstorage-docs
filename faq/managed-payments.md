@@ -1,3 +1,7 @@
+---
+description: "What dStorage Pro is, what the managed payment service can see, how to configure it, ds_* API tokens vs browser-safe JWT tokens, and testing without spending real funds."
+---
+
 # Managed Payments & dStorage Pro
 
 ### What is dStorage Pro?

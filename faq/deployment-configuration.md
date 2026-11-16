@@ -50,7 +50,7 @@ Node.js (provider mode) — caller supplies a pre-built, synced WalletFacade:
   indexerEndpoint,      // required: indexer GraphQL (HTTP) URL
   indexerWsEndpoint,    // required: indexer GraphQL WebSocket URL
   proofServerEndpoint: "http://localhost:6300", // required
-  zkArtifactsPath,      // optional: absolute path to keys/ and zkir/ dirs — the SDK
+  zkArtifactsPath,      // optional: absolute path to keys/, zkir/ and compiler/ — the SDK
                          // ships its own compiled copy (see below), no separate compile needed
 }
 ```
@@ -61,7 +61,7 @@ Browser (connector mode) — delegates to a wallet extension (1AM, Lace, or anot
 {
   walletMode: "connector",
   connectorName: "1am",              // wallet to prefer under window.midnight
-  zkConfigBaseUrl: window.location.origin, // base URL serving keys/ and zkir/
+  zkConfigBaseUrl: window.location.origin, // base URL serving keys/, zkir/ and compiler/
   network: "preprod",                // must match the network the wallet is set to
   proofServerEndpoint: "http://localhost:6300", // required with the default prover
   // indexer endpoints come from the wallet unless set here
@@ -108,10 +108,12 @@ Omit `contractAddress` to deploy a new contract on first `init()`.
 ### Where do ZK artifacts live and how are they served?
 
 `DataRegistry` is dStorage's own fixed contract — not something you compile yourself. Its
-compiled ZK artifacts (prover/verifier keys and ZKIR) ship inside the
-`@dstorage-tech/dstorage-sdk` package at `dist/contracts/dataregistry/managed/{keys,zkir}`.
+compiled ZK artifacts (prover/verifier keys, ZKIR, and the compiler's integrity manifest and
+contract description) ship inside the `@dstorage-tech/dstorage-sdk` package at
+`dist/contracts/dataregistry/managed/{keys,zkir,compiler}`. All three folders are required: the
+Midnight SDK reads `compiler/` to tell which ledger version the artifacts were built for.
 
-- **Node.js**: pass an absolute path via `zkArtifactsPath`. The adapter reads `keys/` and `zkir/` from that directory. Resolve the bundled copy via the package's own `package.json` rather than hardcoding a `node_modules` path:
+- **Node.js**: pass an absolute path via `zkArtifactsPath`. The adapter reads `keys/`, `zkir/` and `compiler/` from that directory. Resolve the bundled copy via the package's own `package.json` rather than hardcoding a `node_modules` path:
   ```typescript
   import { createRequire } from "node:module";
   import path from "node:path";
@@ -121,5 +123,5 @@ compiled ZK artifacts (prover/verifier keys and ZKIR) ship inside the
     "dist/contracts/dataregistry/managed",
   );
   ```
-- **Browser**: copy `keys/` and `zkir/` from `node_modules/@dstorage-tech/dstorage-sdk/dist/contracts/dataregistry/managed/` into your application's public assets directory, then pass `zkConfigBaseUrl: window.location.origin`. Artifacts are fetched over HTTP. (The [`dstorage-starter-template`](https://github.com/dStorageTech/dstorage-starter-template)'s `npm run dev` does this automatically — see `scripts/copy-zk-artifacts.mjs`.)
+- **Browser**: copy `keys/`, `zkir/` and `compiler/` from `node_modules/@dstorage-tech/dstorage-sdk/dist/contracts/dataregistry/managed/` into your application's public assets directory, then pass `zkConfigBaseUrl: window.location.origin`. Artifacts are fetched over HTTP. Copy them again whenever you upgrade the SDK, and deploy them with your production build. (The [`dstorage-starter-template`](https://github.com/dStorageTech/dstorage-starter-template)'s `npm run dev` and `npm run build` do this automatically — see `scripts/copy-zk-artifacts.mjs`.)
 

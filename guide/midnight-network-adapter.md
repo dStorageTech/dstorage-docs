@@ -63,16 +63,22 @@ Use those modes only with a wallet extension you trust.
   extension (1AM by default, but Lace or any other wallet implementing the dApp Connector API
   works too). This is what the rest of this guide uses.
 
-Connector mode fetches the compiled `DataRegistry` contract's ZK artifacts (`keys/` and `zkir/`)
-over HTTP from your app's own origin, instead of reading them from disk. Copy them from the
-installed SDK package into Vite's `public/` directory so they're served alongside your app
-(`dstorage-starter-template`'s `npm run dev` does this for you automatically — see
-`scripts/copy-zk-artifacts.mjs`):
+Connector mode fetches the compiled `DataRegistry` contract's ZK artifacts (`keys/`, `zkir/` and
+`compiler/`) over HTTP from your app's own origin, instead of reading them from disk. Copy them
+from the installed SDK package into Vite's `public/` directory so they're served alongside your
+app (`dstorage-starter-template`'s `npm run dev` and `npm run build` do this for you
+automatically — see `scripts/copy-zk-artifacts.mjs`):
 
 ```sh
 cp -r node_modules/@dstorage-tech/dstorage-sdk/dist/contracts/dataregistry/managed/keys public/keys
 cp -r node_modules/@dstorage-tech/dstorage-sdk/dist/contracts/dataregistry/managed/zkir public/zkir
+cp -r node_modules/@dstorage-tech/dstorage-sdk/dist/contracts/dataregistry/managed/compiler public/compiler
 ```
+
+`compiler/` holds the contract's integrity manifest and compiler description, which the Midnight
+SDK reads to tell which ledger version the artifacts were built for. Without it every contract
+operation fails with an error saying the ZK config provider "could not report which
+compact-runtime built these artifacts". Copy the folders again whenever you upgrade the SDK.
 
 This guide keeps `ArweaveLocalStorageAdapter` for storage, to isolate what changes on the chain
 side.
@@ -92,7 +98,7 @@ const { adapter: storageAdapter } = await ArweaveLocalStorageAdapter.createWithT
 const chainAdapter = new MidnightChainAdapter({
   walletMode: "connector",
   connectorName: "1am", // matches window.midnight['1am'] by injected key or wallet name — omit to use whichever wallet is found first
-  zkConfigBaseUrl: window.location.origin, // serves the keys/ and zkir/ you copied to public/
+  zkConfigBaseUrl: window.location.origin, // serves the keys/, zkir/ and compiler/ you copied to public/
   network: "preprod", // matches the Preprod Faucet used to fund your wallet
   proofServerEndpoint: "http://localhost:6300", // required with the default prover
 });

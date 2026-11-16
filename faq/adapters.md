@@ -202,7 +202,7 @@ const sdk = new DStorage({
 
 Real Midnight network. Connects to the Midnight blockchain named by the required `network` field (e.g. `preprod`, `preview`, `undeployed`). The adapter has no built-in default endpoints — which ones you must supply depends on the `walletMode` you choose for your runtime:
 
-- **`"provider"` (Node.js)**: you build and sync a `WalletFacade` yourself, then pass it as `walletProvider`. Also requires `privateStatePassword` (LevelDB encryption), `indexerEndpoint`, `indexerWsEndpoint`, and `proofServerEndpoint` — the constructor throws if any is missing — and optionally `zkArtifactsPath` (absolute path to the `keys/` and `zkir/` directories).
+- **`"provider"` (Node.js)**: you build and sync a `WalletFacade` yourself, then pass it as `walletProvider`. Also requires `privateStatePassword` (LevelDB encryption), `indexerEndpoint`, `indexerWsEndpoint`, and `proofServerEndpoint` — the constructor throws if any is missing — and optionally `zkArtifactsPath` (absolute path to the directory holding `keys/`, `zkir/` and `compiler/`).
 - **`"connector"` (browser)**: delegates all key management to a Midnight wallet extension — by default the first wallet discovered under `window.midnight`, or pass `connectorName` (e.g. `"1am"`) to prefer a specific one (matched by rdns, then declared name, then the injected key). Lace, 1AM, or any other wallet implementing the dApp Connector API works. Requires `zkConfigBaseUrl` set to the base URL from which the ZK artifacts are served. The indexer endpoints default to the ones the connected wallet reports (set `indexerEndpoint`/`indexerWsEndpoint` to override them). The `prover` option selects where ZK proofs are generated (see [Where are ZK proofs generated in connector mode?](#where-are-zk-proofs-generated-in-connector-mode) below); by default that's the proof server at `proofServerEndpoint`, which is then required.
 
 `init()` either deploys a fresh DataRegistry contract or, if you pass `contractAddress`, reconnects to an existing one. Save the returned address across runs to avoid redeploying.
@@ -257,7 +257,7 @@ import { MidnightChainAdapter, PROVER_MODE } from "@dstorage-tech/dstorage-sdk/b
 
 new MidnightChainAdapter({
   walletMode: "connector",
-  zkConfigBaseUrl: window.location.origin, // the wallet fetches keys/ and zkir/ from here
+  zkConfigBaseUrl: window.location.origin, // the wallet fetches keys/, zkir/ and compiler/ from here
   network: "preprod",
   prover: PROVER_MODE.WALLET_DELEGATED, // no proof server to run
 });

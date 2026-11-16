@@ -87,7 +87,7 @@ ${TOKEN_HANDLING} ${LOCAL_SERVICES} ${ES_MODULE} ${CONFLICTS}`,
 Read the ${guide("Midnight Network Adapter", "midnight-network-adapter")}, then follow it in my current project. This guide runs in the browser with Vite:
 
 1. Make sure arlocal is running on port 1984, and start the Midnight proof server Docker image on port 6300 with the exact image tag the guide uses.
-2. Copy the SDK's DataRegistry keys/ and zkir/ folders into public/, as the guide shows, and add a script so this happens on every dev run.
+2. Copy the SDK's DataRegistry keys/, zkir/ and compiler/ folders into public/, as the guide shows, and add a script so this happens on every dev and build run.
 3. Import from @dstorage-tech/dstorage-sdk/browser and configure MidnightChainAdapter in "connector" mode for the preprod network. Keep ArweaveLocalStorageAdapter and PasswordEncryptionAdapter.
 4. Wire init() / store() / retrieveByRefId() to a Run button, logging the contract address and the decoded "hello, dStorage" result.
 5. Make the contract address configurable, so I can paste the one from my first run and reconnect to that contract instead of deploying a new one.

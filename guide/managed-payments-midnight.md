@@ -1,5 +1,5 @@
 ---
-description: "Use dStorage on a real Midnight network with DUST fees sponsored by dStorage Pro, so neither you nor your users need a wallet funded with DUST or NIGHT."
+description: "Use dStorage on Midnight Preprod or Mainnet with DUST fees sponsored by dStorage Pro, so neither you nor your users need a wallet funded with DUST or NIGHT."
 ---
 
 # Managed Payments on Midnight
@@ -143,6 +143,41 @@ What's different from the Midnight Network Adapter guide:
   the portal dashboard.
 - **Storage is unchanged** — uploads still land in your local arlocal instance via
   `ArweaveLocalStorageAdapter`.
+
+## Going to Mainnet
+
+dStorage Pro signs on both **Midnight Preprod and Mainnet**. Once your app works on Preprod,
+moving to production is a config change — your code stays the same:
+
+- **Wallet** — switch the wallet extension to the Mainnet network. It still needs no DUST or
+  NIGHT; dStorage Pro covers the chain fees.
+- **`network: "mainnet"`** on `MidnightChainAdapter` — it must match the wallet's network, or
+  `init()` throws.
+- **Proof server** — point `proofServerEndpoint` at a proof server for Mainnet (or use one of
+  the [wallet prover modes](/faq/adapters#where-are-zk-proofs-generated-in-connector-mode)).
+- **Storage** — replace `ArweaveLocalStorageAdapter` with `ArweaveBundlerStorageAdapter` or
+  `ArweaveStorageAdapter` on Arweave mainnet, with `managedPayment` so storage is paid by
+  dStorage Pro too. See the [adapter reference](/faq/adapters#arweavebundlerstorageadapter) for
+  the token each one needs.
+- **Token** — the same kind of token works on both networks. For a production browser app,
+  create a JWT locked to your site's origin, with a spend cap.
+- **Billing** — every `store()` on Mainnet is charged to your dStorage Pro balance, as on
+  Preprod. Keep the balance topped up from the portal.
+
+```typescript
+const chainAdapter = new MidnightChainAdapter({
+  walletMode: "connector",
+  connectorName: "1am",
+  zkConfigBaseUrl: window.location.origin,
+  network: "mainnet",
+  proofServerEndpoint: "https://your-mainnet-proof-server.example",
+  managedPayment,
+});
+```
+
+A DataRegistry contract deployed on Preprod doesn't exist on Mainnet: call `init()` once on
+Mainnet without `contractAddress` to deploy a new one, and save the returned address separately
+for each network.
 
 ## Learn More
 

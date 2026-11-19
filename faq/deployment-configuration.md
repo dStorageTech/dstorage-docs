@@ -30,7 +30,7 @@ No real AR tokens are needed — arlocal auto-funds test wallets.
 
 ### What Midnight networks does the adapter support?
 
-Any Midnight network — `undeployed` (localhost), `preprod`, `preview`, or another — passed as the required `network` field. The adapter has no built-in default endpoints:
+Any Midnight network — `mainnet`, `preprod`, `preview`, `undeployed` (localhost), or another — passed as the required `network` field. The adapter has no built-in default endpoints:
 
 - **Provider mode** requires `indexerEndpoint`, `indexerWsEndpoint`, and `proofServerEndpoint`; the constructor throws if any is missing.
 - **Connector mode** uses the indexer endpoints reported by the connected wallet unless you set `indexerEndpoint`/`indexerWsEndpoint` yourself, and `init()` throws if the wallet is on a different network than `network`. With the default `prover` (`PROVER_MODE.PROOF_SERVER_URL`), `proofServerEndpoint` is required too; the wallet prover modes use the wallet's proof server or the wallet itself instead (see [Where are ZK proofs generated in connector mode?](/faq/adapters#where-are-zk-proofs-generated-in-connector-mode)).

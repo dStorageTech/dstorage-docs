@@ -30,6 +30,10 @@ In connector mode, the wallet submits transactions to the network it's connected
 
 If either indexer can't be reached, `init()` logs a warning and continues without the check.
 
+### `HTTP 400 — Unsupported Midnight networkId` (`MANAGED_SIGN_HTTP_ERROR`)
+
+`MidnightChainAdapter` is configured with `managedPayment`, but its `network` is one dStorage Pro doesn't sign on. dStorage Pro signs on Midnight `mainnet` and `preprod`; the error lists the supported ids. Set `network` to one of them, matching your wallet's network. For `preview` or a local `undeployed` devnet, remove `managedPayment` and fund the wallet with DUST instead (see [Which Midnight networks does dStorage Pro sign on?](/faq/managed-payments#which-midnight-networks-does-dstorage-pro-sign-on)).
+
 ### Deploy or write never finishes
 
 The transaction was submitted but the adapter never sees it confirmed. The deploy log line names the indexer it's waiting on. Check that this indexer is up and on the same network as the wallet. A configured indexer on a different chain is rejected at `init()` with `MIDNIGHT_INDEXER_NETWORK_MISMATCH` (see above).

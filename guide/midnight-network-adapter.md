@@ -157,6 +157,12 @@ What's different now that you're on a live network:
   `MidnightChainAdapter` on subsequent runs, so you reconnect to the same contract instead of
   deploying a new one each time.
 
+::: tip Running on Mainnet
+The same config runs on Midnight Mainnet: switch the wallet to Mainnet and set
+`network: "mainnet"`. With [managed payments](/guide/managed-payments-midnight#going-to-mainnet),
+dStorage Pro covers DUST fees on both Preprod and Mainnet, so the wallet needs no DUST or NIGHT.
+:::
+
 ## Learn More
 
 - Browse the FAQ for more on [deployment & configuration](/faq/deployment-configuration#deployment-configuration) and the [full adapter reference](/faq/adapters#adapters).

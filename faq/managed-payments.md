@@ -1,5 +1,5 @@
 ---
-description: "What dStorage Pro is, what the managed payment service can see, how to configure it, ds_* API tokens vs browser-safe JWT tokens, and testing without spending real funds."
+description: "What dStorage Pro is, what the managed payment service can see, which Midnight networks it signs on (Mainnet and Preprod), how to configure it, ds_* API tokens vs browser-safe JWT tokens, and testing without spending real funds."
 ---
 
 # Managed Payments & dStorage Pro
@@ -97,6 +97,15 @@ Or add them to a `.env` file in your project root (loaded via `dotenv` or equiva
 ### What does the managed Midnight chain payment flow look like?
 
 DUST chain fees are sponsored by the managed service too — not just Arweave storage. When `MidnightChainAdapter` is configured with `managedPayment`, the SDK wraps the wallet's transaction-balancing step so the signing server balances *and* signs the transaction on the wallet's behalf. The local wallet only needs to expose its public keys (for the ZK circuit) — it never needs to hold DUST. This is automatic: no configuration beyond `managedPayment` on `MidnightChainAdapter` is needed. See the [Managed Payments on Midnight](/guide/managed-payments-midnight) guide for a walkthrough.
+
+### Which Midnight networks does dStorage Pro sign on?
+
+**Mainnet and Preprod.** Set `network` on `MidnightChainAdapter` to `"mainnet"` or `"preprod"` — it must match the network your wallet is connected to — and the SDK sends it to dStorage Pro with each request. Use Preprod while you build and test, and Mainnet for production.
+
+- The same token works on both networks: a JWT or `ds_*` token isn't tied to one Midnight network, and both networks are charged to the same dStorage Pro balance.
+- Other network ids (such as `preview` or a local `undeployed` devnet) are rejected with `HTTP 400 — Unsupported Midnight networkId` (see [Troubleshooting](/faq/troubleshooting)). On those networks, use `MidnightChainAdapter` without `managedPayment` and a wallet funded with DUST, or `MidnightSimulatorChainAdapter` with the `TEST` sandbox.
+
+See [Going to Mainnet](/guide/managed-payments-midnight#going-to-mainnet) for the config changes between Preprod and Mainnet.
 
 ### Is there a known security limitation with the managed payment response?
 
